@@ -94,7 +94,7 @@ function StyledSelect({
 
 export function PhoneLoginForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [country, setCountry] = useState<CountryCode>('NG');
+  const [country, setCountry] = useState<CountryCode>('US');
   const [placeholder, setPlaceholder] = useState('');
   const [otp, setOtp] = useState('');
   const [sid, setSid] = useState('');
