@@ -14,9 +14,8 @@ import { AuthFlowsLoader } from '../../components/AuthFlowsLoader';
 import { AuthFlowsProvider } from '../../hooks/useAuthFlows';
 import { AuthServerProvider } from '../../hooks/useAuthServer';
 import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
+import { BASE_URL } from '../../../../constants';
 // import CinnySVG from '../../../../public/res/svg/cinny.svg';
-
-const HARDCODED_SERVER_URL = 'http://localhost:8008';
 
 function AuthLayoutLoading({ message }: { message: string }) {
   return (
@@ -40,7 +39,7 @@ function AuthLayoutError({ message }: { message: string }) {
 }
 
 export function AuthLayout() {
-  const server = 'http://localhost:8008';
+  const server = BASE_URL;
 
   const [discoveryState, discoverServer] = useAsyncCallback(
     useCallback(async (serverName: string) => {
@@ -94,10 +93,8 @@ export function AuthLayout() {
               <AuthServerProvider value={discoveryState.data.serverName}>
                 <AutoDiscoveryInfoProvider value={autoDiscoveryInfo}>
                   <SpecVersionsLoader
-                    baseUrl={HARDCODED_SERVER_URL}
-                    fallback={() => (
-                      <AuthLayoutLoading message={`Connecting to ${HARDCODED_SERVER_URL}`} />
-                    )}
+                    baseUrl={BASE_URL}
+                    fallback={() => <AuthLayoutLoading message={`Connecting to ${BASE_URL}`} />}
                     error={() => (
                       <AuthLayoutError message="Failed to connect. Either server is unavailable at this moment or does not exist." />
                     )}
