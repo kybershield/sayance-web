@@ -14,7 +14,7 @@ import { AuthFlowsLoader } from '../../components/AuthFlowsLoader';
 import { AuthFlowsProvider } from '../../hooks/useAuthFlows';
 import { AuthServerProvider } from '../../hooks/useAuthServer';
 import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
-import { BASE_URL } from '../../../../constants';
+import { BASE_URL } from '../../../util/constants';
 // import CinnySVG from '../../../../public/res/svg/cinny.svg';
 
 function AuthLayoutLoading({ message }: { message: string }) {

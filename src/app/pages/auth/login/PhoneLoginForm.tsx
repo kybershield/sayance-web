@@ -6,7 +6,7 @@ import { MatrixError } from 'matrix-js-sdk';
 import { AsyncStatus, useAsyncCallback } from '../../../hooks/useAsyncCallback';
 import { CustomLoginResponse, useLoginComplete } from './loginUtil';
 import { FieldError } from '../FiledError';
-import { BASE_URL } from '../../../../../constants';
+import { BASE_URL } from '../../../../util/constants';
 
 type RequestTokenResponse = {
   sid: string;
