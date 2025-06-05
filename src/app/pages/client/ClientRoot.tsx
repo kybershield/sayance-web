@@ -37,6 +37,7 @@ import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
 import { useSyncState } from '../../hooks/useSyncState';
 import { stopPropagation } from '../../utils/keyboard';
 import { SyncStatus } from './SyncStatus';
+import { CallManager } from '../../components/call';
 
 function ClientRootLoading() {
   return (
@@ -215,6 +216,7 @@ export function ClientRoot({ children }: ClientRootProps) {
                   <Windows />
                   <Dialogs />
                   <ReusableContextMenu />
+                  <CallManager />
                 </MediaConfigProvider>
               </CapabilitiesProvider>
             )}

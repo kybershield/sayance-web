@@ -1,38 +1,53 @@
 {
-  "defaultHomeserver": 2,
+  "defaultHomeserver": 0,
   "homeserverList": [
-    "converser.eu",
-    "envs.net",
-    "matrix.org",
-    "monero.social",
-    "mozilla.org",
-    "xmr.se"
+    "sayance.localhost"
   ],
   "allowCustomHomeservers": true,
-
-  "featuredCommunities": {
-    "openAsDefault": false,
-    "spaces": [
-      "#cinny-space:matrix.org",
-      "#community:matrix.org",
-      "#space:envs.net",
-      "#science-space:matrix.org",
-      "#libregaming-games:tchncs.de",
-      "#mathematics-on:matrix.org"
-    ],
-    "rooms": [
-      "#cinny:matrix.org",
-      "#freesoftware:matrix.org",
-      "#pcapdroid:matrix.org",
-      "#gentoo:matrix.org",
-      "#PrivSec.dev:arcticfoxes.net",
-      "#disroot:aria-net.org"
-    ],
-    "servers": ["envs.net", "matrix.org", "monero.social", "mozilla.org"]
+  "featuresEnabled": {
+    "spacesEnabled": true,
+    "voipEnabled": true,
+    "threadsEnabled": true,
+    "elementCallEnabled": true
   },
-
   "hashRouter": {
     "enabled": false,
     "basename": "/"
-  }
+  },
+  "branding": {
+    "name": "Sayance",
+    "logo": "/logo.svg",
+    "favicon": "/favicon.ico"
+  },
+  "elementCall": {
+    "url": "https://call.element.io",
+    "participantLimit": 8,
+    "brand": "Sayance Call"
+  },
+  "allowedWidgets": [
+    "https://call.element.io",
+    "https://app.sayance.localhost"
+  ],
+  "experimentalFeatures": {
+    "msc4143": true,
+    "msc4140": true,
+    "msc4222": true,
+    "msc3266": true
+  },
+  "developmentMode": true,
+  "themes": [
+    {
+      "name": "Silver",
+      "id": "silver"
+    },
+    {
+      "name": "Dark",
+      "id": "dark"
+    },
+    {
+      "name": "Butter",
+      "id": "butter"
+    }
+  ],
+  "defaultTheme": "silver"
 }
