@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Icon, Icons } from 'folds';
+import { Box, Icon, Icons, Text, toRem } from 'folds';
 import { useAtomValue } from 'jotai';
 import {
   SidebarAvatar,
@@ -47,8 +47,11 @@ export function InboxTab() {
     <SidebarItem active={inboxSelected}>
       <SidebarItemTooltip tooltip="Inbox">
         {(triggerRef) => (
-          <SidebarAvatar as="button" ref={triggerRef} outlined onClick={handleInboxClick}>
+          <SidebarAvatar as="button" ref={triggerRef} onClick={handleInboxClick}>
             <Icon src={Icons.Inbox} filled={inboxSelected} />
+            <Text style={{ color: inboxSelected ? '#000' : '#75808A', fontSize: toRem(12) }}>
+              Requests
+            </Text>
           </SidebarAvatar>
         )}
       </SidebarItemTooltip>

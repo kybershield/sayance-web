@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text } from 'folds';
+import { Avatar, Box, Text, toRem } from 'folds';
 import { SidebarItem, SidebarItemTooltip, SidebarAvatar } from '../../../components/sidebar';
 import { UserAvatar } from '../../../components/user-avatar';
 import { useMatrixClient } from '../../../hooks/useMatrixClient';
@@ -31,11 +31,17 @@ export function SettingsTab() {
       <SidebarItemTooltip tooltip={displayName}>
         {(triggerRef) => (
           <SidebarAvatar as="button" ref={triggerRef} onClick={openSettings}>
-            <UserAvatar
-              userId={userId}
-              src={avatarUrl}
-              renderFallback={() => <Text size="H4">{nameInitials(displayName)}</Text>}
-            />
+            <Avatar size="300">
+              <UserAvatar
+                userId={userId}
+                src={avatarUrl}
+                renderFallback={() => <Text size="H6">{nameInitials(displayName)}</Text>}
+              />
+            </Avatar>
+
+            <Text style={{ color: settings ? '#000' : '#75808A', fontSize: toRem(12) }}>
+              Settings
+            </Text>
           </SidebarAvatar>
         )}
       </SidebarItemTooltip>

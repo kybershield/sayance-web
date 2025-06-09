@@ -30,12 +30,14 @@ export function SidebarNav() {
         scrollable={
           <Scroll ref={scrollRef} variant="Background" size="0">
             <SidebarStack>
-              <HomeTab />
+              {/* <HomeTab /> Possibly where Calls tab will be  */}
               <DirectTab />
+              <InboxTab />
+              <SettingsTab />
             </SidebarStack>
-            <SpaceTabs scrollRef={scrollRef} />
-            <SidebarStackSeparator />
-            <SidebarStack>
+            {/* <SpaceTabs scrollRef={scrollRef} />
+            <SidebarStackSeparator /> */}
+            {/* <SidebarStack>
               <ExploreTab />
               <SidebarItem>
                 <SidebarItemTooltip tooltip="Create Space">
@@ -51,35 +53,36 @@ export function SidebarNav() {
                   )}
                 </SidebarItemTooltip>
               </SidebarItem>
-            </SidebarStack>
+            </SidebarStack> */}
           </Scroll>
         }
-        sticky={
-          <>
-            <SidebarStackSeparator />
-            <SidebarStack>
-              <SidebarItem>
-                <SidebarItemTooltip tooltip="Search">
-                  {(triggerRef) => (
-                    <SidebarAvatar
-                      as="button"
-                      ref={triggerRef}
-                      outlined
-                      onClick={() => openSearch()}
-                    >
-                      <Icon src={Icons.Search} />
-                    </SidebarAvatar>
-                  )}
-                </SidebarItemTooltip>
-              </SidebarItem>
+        // sticky={
+        //   <>
+        //     <SidebarStackSeparator />
+        //     <SidebarStack>
+        //       <SidebarItem>
+        //         <SidebarItemTooltip tooltip="Search">
+        //           {(triggerRef) => (
+        //             <SidebarAvatar
+        //               as="button"
+        //               ref={triggerRef}
+        //               outlined
+        //               onClick={() => openSearch()}
+        //             >
+        //               <Icon src={Icons.Search} />
+        //             </SidebarAvatar>
+        //           )}
+        //         </SidebarItemTooltip>
+        //       </SidebarItem>
 
-              <UnverifiedTab />
+        //       <UnverifiedTab />
 
-              <InboxTab />
-              <SettingsTab />
-            </SidebarStack>
-          </>
-        }
+        //       {/* <InboxTab /> */}
+        //       {/* <SettingsTab /> */}
+        //     </SidebarStack>
+        //   </>
+        // }
+        sticky={<></>}
       />
     </Sidebar>
   );

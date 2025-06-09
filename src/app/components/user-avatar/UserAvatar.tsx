@@ -1,4 +1,4 @@
-import { AvatarFallback, AvatarImage, color } from 'folds';
+import { AvatarFallback, AvatarImage, color, toRem } from 'folds';
 import React, { ReactEventHandler, ReactNode, useState } from 'react';
 import * as css from './UserAvatar.css';
 import colorMXID from '../../../util/colorMXID';
@@ -19,7 +19,11 @@ export function UserAvatar({ userId, src, alt, renderFallback }: UserAvatarProps
   if (!src || error) {
     return (
       <AvatarFallback
-        style={{ backgroundColor: colorMXID(userId), color: color.Surface.Container }}
+        style={{
+          backgroundColor: colorMXID(userId),
+          color: color.Surface.Container,
+          borderRadius: '100%',
+        }}
         className={css.UserAvatar}
       >
         {renderFallback()}
