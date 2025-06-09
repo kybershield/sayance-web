@@ -1,8 +1,6 @@
 {
   "defaultHomeserver": 0,
-  "homeserverList": [
-    "sayance.localhost"
-  ],
+  "homeserverList": ["sayance.localhost"],
   "allowCustomHomeservers": true,
   "featuresEnabled": {
     "spacesEnabled": true,
@@ -24,10 +22,7 @@
     "participantLimit": 8,
     "brand": "Sayance Call"
   },
-  "allowedWidgets": [
-    "https://call.element.io",
-    "https://app.sayance.localhost"
-  ],
+  "allowedWidgets": ["https://call.element.io", "https://app.sayance.localhost"],
   "experimentalFeatures": {
     "msc4143": true,
     "msc4140": true,
@@ -39,14 +34,6 @@
     {
       "name": "Silver",
       "id": "silver"
-    },
-    {
-      "name": "Dark",
-      "id": "dark"
-    },
-    {
-      "name": "Butter",
-      "id": "butter"
     }
   ],
   "defaultTheme": "silver"

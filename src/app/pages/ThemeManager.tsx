@@ -10,18 +10,21 @@ import {
 } from '../hooks/useTheme';
 
 export function UnAuthRouteThemeManager() {
-  const systemThemeKind = useSystemThemeKind();
+  // TEMPORARY: Force light mode only - always use light theme kind
+  // const systemThemeKind = useSystemThemeKind();
 
   useEffect(() => {
     document.body.className = '';
     document.body.classList.add(configClass, varsClass);
-    if (systemThemeKind === ThemeKind.Dark) {
-      document.body.classList.add(...DarkTheme.classNames);
-    }
-    if (systemThemeKind === ThemeKind.Light) {
-      document.body.classList.add(...LightTheme.classNames);
-    }
-  }, [systemThemeKind]);
+    // TEMPORARY: Force light mode only - always add light theme classes
+    // if (systemThemeKind === ThemeKind.Dark) {
+    //   document.body.classList.add(...DarkTheme.classNames);
+    // }
+    // if (systemThemeKind === ThemeKind.Light) {
+    //   document.body.classList.add(...LightTheme.classNames);
+    // }
+    document.body.classList.add(...LightTheme.classNames);
+  }, []); // TEMPORARY: removed systemThemeKind dependency
 
   return null;
 }

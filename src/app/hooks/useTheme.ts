@@ -39,7 +39,9 @@ export const ButterTheme: Theme = {
 };
 
 export const useThemes = (): Theme[] => {
-  const themes: Theme[] = useMemo(() => [LightTheme, SilverTheme, DarkTheme, ButterTheme], []);
+  // TEMPORARY: Force light mode only - commented out dark themes
+  // const themes: Theme[] = useMemo(() => [LightTheme, SilverTheme, DarkTheme, ButterTheme], []);
+  const themes: Theme[] = useMemo(() => [LightTheme, SilverTheme], []);
 
   return themes;
 };
@@ -49,52 +51,61 @@ export const useThemeNames = (): Record<string, string> =>
     () => ({
       [LightTheme.id]: 'Light',
       [SilverTheme.id]: 'Silver',
-      [DarkTheme.id]: 'Dark',
-      [ButterTheme.id]: 'Butter',
+      // TEMPORARY: Force light mode only - commented out dark theme names
+      // [DarkTheme.id]: 'Dark',
+      // [ButterTheme.id]: 'Butter',
     }),
     []
   );
 
 export const useSystemThemeKind = (): ThemeKind => {
-  const darkModeQueryList = useMemo(() => window.matchMedia('(prefers-color-scheme: dark)'), []);
-  const [themeKind, setThemeKind] = useState<ThemeKind>(
-    darkModeQueryList.matches ? ThemeKind.Dark : ThemeKind.Light
-  );
+  // TEMPORARY: Force light mode only - always return Light
+  // const darkModeQueryList = useMemo(() => window.matchMedia('(prefers-color-scheme: dark)'), []);
+  // const [themeKind, setThemeKind] = useState<ThemeKind>(
+  //   darkModeQueryList.matches ? ThemeKind.Dark : ThemeKind.Light
+  // );
 
-  useEffect(() => {
-    const handleMediaQueryChange = () => {
-      setThemeKind(darkModeQueryList.matches ? ThemeKind.Dark : ThemeKind.Light);
-    };
+  // useEffect(() => {
+  //   const handleMediaQueryChange = () => {
+  //     setThemeKind(darkModeQueryList.matches ? ThemeKind.Dark : ThemeKind.Light);
+  //   };
 
-    darkModeQueryList.addEventListener('change', handleMediaQueryChange);
-    return () => {
-      darkModeQueryList.removeEventListener('change', handleMediaQueryChange);
-    };
-  }, [darkModeQueryList, setThemeKind]);
+  //   darkModeQueryList.addEventListener('change', handleMediaQueryChange);
+  //   return () => {
+  //     darkModeQueryList.removeEventListener('change', handleMediaQueryChange);
+  //   };
+  // }, [darkModeQueryList, setThemeKind]);
 
-  return themeKind;
+  // return themeKind;
+  return ThemeKind.Light;
 };
 
 export const useActiveTheme = (): Theme => {
-  const systemThemeKind = useSystemThemeKind();
+  // TEMPORARY: Force light mode only - simplified logic to always return light themes
+  // const systemThemeKind = useSystemThemeKind();
   const themes = useThemes();
   const [systemTheme] = useSetting(settingsAtom, 'useSystemTheme');
   const [themeId] = useSetting(settingsAtom, 'themeId');
   const [lightThemeId] = useSetting(settingsAtom, 'lightThemeId');
-  const [darkThemeId] = useSetting(settingsAtom, 'darkThemeId');
+  // const [darkThemeId] = useSetting(settingsAtom, 'darkThemeId');
 
   if (!systemTheme) {
+    // Always default to light theme or silver theme if selected theme is not available
     const selectedTheme = themes.find((theme) => theme.id === themeId) ?? LightTheme;
-
     return selectedTheme;
   }
 
-  const selectedTheme =
-    systemThemeKind === ThemeKind.Dark
-      ? themes.find((theme) => theme.id === darkThemeId) ?? DarkTheme
-      : themes.find((theme) => theme.id === lightThemeId) ?? LightTheme;
-
+  // Always use light theme preference, ignore dark theme
+  const selectedTheme = themes.find((theme) => theme.id === lightThemeId) ?? LightTheme;
   return selectedTheme;
+
+  // Original logic commented out:
+  // const selectedTheme =
+  //   systemThemeKind === ThemeKind.Dark
+  //     ? themes.find((theme) => theme.id === darkThemeId) ?? DarkTheme
+  //     : themes.find((theme) => theme.id === lightThemeId) ?? LightTheme;
+  //
+  // return selectedTheme;
 };
 
 const ThemeContext = createContext<Theme | null>(null);
