@@ -100,6 +100,7 @@ export const createRouter = (clientConfig: ClientConfig, screenSize: ScreenSize)
               getOriginBaseUrl(hashRouter),
               window.location.href
             );
+            console.log('afterLoginPath', afterLoginPath);
             if (afterLoginPath) setAfterLoginRedirectPath(afterLoginPath);
             return redirect(getLoginPath());
           }
