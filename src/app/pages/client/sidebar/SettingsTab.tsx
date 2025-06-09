@@ -40,7 +40,7 @@ export function SettingsTab() {
             </Avatar>
 
             <Text style={{ color: settings ? '#000' : '#75808A', fontSize: toRem(12) }}>
-              Settings
+              Profile
             </Text>
           </SidebarAvatar>
         )}

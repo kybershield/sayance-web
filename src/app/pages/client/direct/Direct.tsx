@@ -184,13 +184,13 @@ function DirectRoomItem({
   onStartVideoCall,
   onStartVoiceCall,
 }: DirectRoomItemProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  // const [isHovered, setIsHovered] = useState(false);
   const callInfo = useRoomCall(room);
 
   return (
     <Box
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
       style={{ position: 'relative' }}
     >
       <RoomNavItem
@@ -212,7 +212,7 @@ function DirectRoomItem({
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            background: 'var(--accent-brand)',
+            // background: 'var(--accent-brand)',
             color: 'white',
             padding: '2px 6px',
             borderRadius: '8px',
@@ -247,7 +247,7 @@ function DirectRoomItem({
       )}
 
       {/* Hover Call Buttons (only show if no active call) */}
-      {isHovered && !callInfo.isCallActive && (
+      {/* {isHovered && !callInfo.isCallActive && (
         <Box
           style={{
             position: 'absolute',
@@ -256,7 +256,7 @@ function DirectRoomItem({
             transform: 'translateY(-50%)',
             display: 'flex',
             gap: '4px',
-            background: 'var(--color-background-solid)',
+            // background: 'var(--color-background-solid)',
             padding: '4px',
             borderRadius: '4px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -287,7 +287,7 @@ function DirectRoomItem({
             <Icon src={Icons.Play} size="100" />
           </IconButton>
         </Box>
-      )}
+      )} */}
     </Box>
   );
 }
@@ -340,14 +340,14 @@ export function Direct() {
 
   return (
     <PageNav>
-      <DirectHeader />
+      {/* <DirectHeader /> */}
       {noRoomToDisplay ? (
         <DirectEmpty />
       ) : (
         <PageNavContent scrollRef={scrollRef}>
           <Box direction="Column" gap="300">
             <NavCategory>
-              <NavItem variant="Background" radii="400">
+              <NavItem radii="400">
                 <NavButton onClick={() => openInviteUser()}>
                   <NavItemContent>
                     <Box as="span" grow="Yes" alignItems="Center" gap="200">

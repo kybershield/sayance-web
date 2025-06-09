@@ -194,6 +194,30 @@ const RoomNavItemMenu = forwardRef<HTMLDivElement, RoomNavItemMenuProps>(
   }
 );
 
+const getLastMessage = (room: Room) => {
+  const events = room.getLiveTimeline().getEvents();
+  for (let i = events.length - 1; i >= 0; i--) {
+    const event = events[i];
+    if (event.getType() === 'm.room.message') {
+      const content = event.getContent();
+      const sender = room.getMember(event.getSender() || '')?.name || event.getSender() || '';
+      if (content.msgtype === 'm.text') {
+        return `${content.body}`;
+      } else if (content.msgtype === 'm.image') {
+        return ` sent an image`;
+      } else if (content.msgtype === 'm.file') {
+        return ` sent a file`;
+      } else if (content.msgtype === 'm.audio') {
+        return ` sent an audio message`;
+      } else if (content.msgtype === 'm.video') {
+        return ` sent a video`;
+      }
+      return `${content.body || 'New message'}`;
+    }
+  }
+  return 'No messages yet';
+};
+
 type RoomNavItemProps = {
   room: Room;
   selected: boolean;
@@ -220,6 +244,7 @@ export function RoomNavItem({
   const typingMember = useRoomTypingMember(room.roomId).filter(
     (receipt) => receipt.userId !== mx.getUserId()
   );
+  const lastMessage = getLastMessage(room);
 
   const handleContextMenu: MouseEventHandler<HTMLElement> = (evt) => {
     evt.preventDefault();
@@ -239,19 +264,20 @@ export function RoomNavItem({
 
   return (
     <NavItem
-      variant="Background"
+      // variant="Background"
       radii="400"
       highlight={unread !== undefined}
       aria-selected={selected}
       data-hover={!!menuAnchor}
       onContextMenu={handleContextMenu}
+      style={{ marginTop: 10 }}
       {...hoverProps}
       {...focusWithinProps}
     >
       <NavLink to={linkPath}>
         <NavItemContent>
           <Box as="span" grow="Yes" alignItems="Center" gap="200">
-            <Avatar size="200" radii="400">
+            <Avatar size="400" radii="500">
               {showAvatar ? (
                 <RoomAvatar
                   roomId={room.roomId}
@@ -276,9 +302,12 @@ export function RoomNavItem({
                 />
               )}
             </Avatar>
-            <Box as="span" grow="Yes">
+            <Box as="span" grow="Yes" direction="Column" gap="100">
               <Text priority={unread ? '500' : '300'} as="span" size="Inherit" truncate>
                 {room.name}
+              </Text>
+              <Text size="T300" as="span" truncate>
+                {lastMessage}
               </Text>
             </Box>
             {!optionsVisible && !unread && !selected && typingMember.length > 0 && (

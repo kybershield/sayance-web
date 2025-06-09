@@ -104,7 +104,8 @@ export function DirectTab() {
             onClick={handleDirectClick}
             onContextMenu={handleContextMenu}
           >
-            <Icon src={Icons.Message} filled={directSelected} />
+            {/* <Icon src={Icons.Message} filled={directSelected} /> */}
+            {directSelected ? <img src={ChatFilledIcon} /> : <img src={ChatIcon} />}
             <Text style={{ color: directSelected ? '#000' : '#75808A', fontSize: toRem(12) }}>
               Chats
             </Text>

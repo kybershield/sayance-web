@@ -19,6 +19,8 @@ import { useInboxSelected } from '../../../hooks/router/useInbox';
 import { UnreadBadge } from '../../../components/unread-badge';
 import { ScreenSize, useScreenSizeContext } from '../../../hooks/useScreenSize';
 import { useNavToActivePathAtom } from '../../../state/hooks/navToActivePath';
+import RequestsIcon from '../../../../../public/icons/requests.svg';
+import RequestsFilledIcon from '../../../../../public/icons/request-filled.svg';
 
 export function InboxTab() {
   const screenSize = useScreenSizeContext();
@@ -48,7 +50,8 @@ export function InboxTab() {
       <SidebarItemTooltip tooltip="Inbox">
         {(triggerRef) => (
           <SidebarAvatar as="button" ref={triggerRef} onClick={handleInboxClick}>
-            <Icon src={Icons.Inbox} filled={inboxSelected} />
+            {/* <Icon src={Icons.Inbox} filled={inboxSelected} /> */}
+            {inboxSelected ? <img src={RequestsFilledIcon} /> : <img src={RequestsIcon} />}
             <Text style={{ color: inboxSelected ? '#000' : '#75808A', fontSize: toRem(12) }}>
               Requests
             </Text>

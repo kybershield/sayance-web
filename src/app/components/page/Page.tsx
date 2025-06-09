@@ -67,7 +67,7 @@ export function PageNavContent({
     <Box grow="Yes" direction="Column">
       <Scroll
         ref={scrollRef}
-        variant="Background"
+        style={{ backgroundColor: '#F4F6F9' }}
         direction="Vertical"
         size="300"
         hideTrack
