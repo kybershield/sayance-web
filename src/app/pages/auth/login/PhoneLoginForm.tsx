@@ -220,8 +220,11 @@ export function PhoneLoginForm() {
             </Text>
             <Input
               value={phoneNumber}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))
+              }
               placeholder={placeholder}
+              inputMode="numeric"
               variant="Background"
               size="500"
               required
@@ -240,7 +243,7 @@ export function PhoneLoginForm() {
           disabled={requestTokenState.status === AsyncStatus.Loading}
         >
           <Text as="span" size="B500">
-            Send Verification Code
+            Continue
           </Text>
         </Button>
 
@@ -264,7 +267,9 @@ export function PhoneLoginForm() {
         </Text>
         <Input
           value={otp}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setOtp(e.target.value.replace(/[^0-9]/g, ''))
+          }
           placeholder="Enter 6-digit code"
           variant="Background"
           size="500"

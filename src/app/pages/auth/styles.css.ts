@@ -2,12 +2,8 @@ import { style } from '@vanilla-extract/css';
 import { DefaultReset, color, config, toRem } from 'folds';
 
 export const AuthLayout = style({
-  minHeight: '100%',
-  backgroundColor: color.Background.Container,
+  minHeight: '100vh',
   color: color.Background.OnContainer,
-  padding: config.space.S400,
-  paddingRight: config.space.S200,
-  paddingBottom: 0,
   position: 'relative',
 });
 
@@ -17,9 +13,9 @@ export const AuthCard = style({
   width: '100%',
   backgroundColor: color.Surface.Container,
   color: color.Surface.OnContainer,
-  borderRadius: config.radii.R400,
-  boxShadow: config.shadow.E100,
-  border: `${config.borderWidth.B300} solid ${color.Surface.ContainerLine}`,
+  // borderRadius: config.radii.R400,
+  // boxShadow: config.shadow.E100,
+  // border: `${config.borderWidth.B300} solid ${color.Surface.ContainerLine}`,
   overflow: 'hidden',
 });
 
@@ -39,15 +35,60 @@ export const AuthHeader = style({
 });
 
 export const AuthCardContent = style({
-  maxWidth: toRem(402),
+  // maxWidth: toRem(402),
   width: '100%',
   margin: 'auto',
-  padding: config.space.S400,
-  paddingTop: config.space.S700,
-  paddingBottom: toRem(44),
-  gap: toRem(44),
+  // padding: config.space.S400,
+  // paddingTop: config.space.S700,
+  // paddingBottom: toRem(44),
+  // gap: toRem(44),
 });
 
 export const AuthFooter = style({
   padding: config.space.S200,
+});
+
+export const AuthSplitContainer = style({
+  width: '100%',
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'stretch',
+  gap: 0,
+  '@media': {
+    'screen and (max-width: 768px)': {
+      flexDirection: 'column',
+      gap: 0,
+    },
+  },
+});
+
+export const AuthLeftSide = style({
+  flex: 1,
+  backgroundColor: '#F4F6F9',
+  paddingLeft: '4rem',
+  paddingRight: '4rem',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: '100vh',
+});
+
+export const AuthRightSide = style({
+  flex: 1,
+  backgroundColor: '#FFFFFF',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  minHeight: '100vh',
+  padding: config.space.S400,
+});
+
+export const AuthImagePlaceholder = style({
+  width: '100%',
+  height: toRem(300),
+  backgroundColor: '#000000',
+  borderRadius: config.radii.R400,
+  minHeight: toRem(200),
+  maxWidth: toRem(400),
 });
