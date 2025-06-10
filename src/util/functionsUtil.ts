@@ -25,3 +25,17 @@ export function phoneNumberToMatrixId(phoneNumber: string): string {
   }
   return `@${number}_1:sayance.org`;
 }
+
+/**
+ * Transforms a partial Matrix ID format to phone number format
+ * @param partialId - Partial Matrix ID in format 2348166406459_1
+ * @returns Phone number in format +2348166406459
+ */
+export function partialMatrixIdToPhoneNumber(partialId: string): string {
+  // Remove the _1 suffix and add + prefix
+  const match = partialId.match(/^(\d+)_1$/);
+  if (!match || !match[1]) {
+    return partialId;
+  }
+  return `+${match[1]}`;
+}

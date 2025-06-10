@@ -49,6 +49,7 @@ import {
   RoomNotificationMode,
 } from '../../hooks/useRoomsNotificationPreferences';
 import { RoomNotificationModeSwitcher } from '../../components/RoomNotificationSwitcher';
+import { partialMatrixIdToPhoneNumber } from '../../../util/functionsUtil';
 
 type RoomNavItemMenuProps = {
   room: Room;
@@ -304,7 +305,7 @@ export function RoomNavItem({
             </Avatar>
             <Box as="span" grow="Yes" direction="Column" gap="100">
               <Text priority={unread ? '500' : '300'} as="span" size="Inherit" truncate>
-                {room.name}
+                {partialMatrixIdToPhoneNumber(room.name)}
               </Text>
               <Text size="T300" as="span" truncate>
                 {lastMessage}

@@ -69,6 +69,7 @@ import { VideoCall } from '../../components/video-call/VideoCall';
 import { useRoomCall } from '../../hooks/useRoomCall';
 import { CallButtons } from '../../components/call';
 import MenuIcon from '../../../../public/icons/menu-icon.svg';
+import { partialMatrixIdToPhoneNumber } from '../../../util/functionsUtil';
 
 type RoomMenuProps = {
   room: Room;
@@ -297,7 +298,7 @@ export function RoomViewHeader() {
           )}
           <Box direction="Column">
             <Text size={topic ? 'H5' : 'H3'} truncate>
-              {name}
+              {partialMatrixIdToPhoneNumber(name)}
             </Text>
             {topic && (
               <UseStateProvider initial={false}>

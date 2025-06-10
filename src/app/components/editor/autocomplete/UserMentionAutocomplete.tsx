@@ -20,6 +20,10 @@ import { getMemberDisplayName, getMemberSearchStr } from '../../../utils/room';
 import { UserAvatar } from '../../user-avatar';
 import { useMediaAuthentication } from '../../../hooks/useMediaAuthentication';
 import { Membership } from '../../../../types/matrix/room';
+import {
+  matrixIdToPhoneNumber,
+  partialMatrixIdToPhoneNumber,
+} from '../../../../util/functionsUtil';
 
 type MentionAutoCompleteHandler = (userId: string, name: string) => void;
 
@@ -168,7 +172,7 @@ export function UserMentionAutocomplete({
               onClick={() => handleAutocomplete(roomMember.userId, getName(roomMember))}
               after={
                 <Text size="T200" priority="300" truncate>
-                  {roomMember.userId}
+                  {matrixIdToPhoneNumber(roomMember.userId)}
                 </Text>
               }
               before={
@@ -183,7 +187,7 @@ export function UserMentionAutocomplete({
               }
             >
               <Text style={{ flexGrow: 1 }} size="B400" truncate>
-                {getName(roomMember)}
+                {partialMatrixIdToPhoneNumber(getName(roomMember))}
               </Text>
             </MenuItem>
           );

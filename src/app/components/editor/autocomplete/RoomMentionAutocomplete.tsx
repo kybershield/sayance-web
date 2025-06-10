@@ -18,6 +18,7 @@ import { allRoomsAtom } from '../../../state/room-list/roomList';
 import { factoryRoomIdByActivity } from '../../../utils/sort';
 import { RoomAvatar, RoomIcon } from '../../room-avatar';
 import { getViaServers } from '../../../plugins/via-servers';
+import { partialMatrixIdToPhoneNumber } from '../../../../util/functionsUtil';
 
 type MentionAutoCompleteHandler = (roomAliasOrId: string, name: string) => void;
 
@@ -180,7 +181,7 @@ export function RoomMentionAutocomplete({
               }
             >
               <Text style={{ flexGrow: 1 }} size="B400" truncate>
-                {room.name}
+                {partialMatrixIdToPhoneNumber(room.name)}
               </Text>
             </MenuItem>
           );

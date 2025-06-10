@@ -11,7 +11,7 @@ function RoomTile({ avatarSrc, name, id, inviterName, memberCount, desc, options
   return (
     <div className="room-tile">
       <div className="room-tile__avatar">
-        <Avatar imageSrc={avatarSrc} bgColor={colorMXID(id)} text={name} />
+        <Avatar imageSrc={avatarSrc} bgColor={colorMXID(id)} text={name.replace('+', '')} />
       </div>
       <div className="room-tile__content">
         <Text variant="s1">{name}</Text>

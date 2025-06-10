@@ -79,6 +79,7 @@ import { StateEvent } from '../../../../types/matrix/room';
 import { getTagIconSrc, PowerLevelTag } from '../../../hooks/usePowerLevelTags';
 import { PowerIcon } from '../../../components/power';
 import colorMXID from '../../../../util/colorMXID';
+import { partialMatrixIdToPhoneNumber } from '../../../../util/functionsUtil';
 
 export type ReactionHandler = (keyOrMxc: string, shortcode: string) => void;
 
@@ -754,7 +755,7 @@ export const Message = as<'div', MessageProps>(
               size={messageLayout === MessageLayout.Bubble ? 'T300' : 'T400'}
               truncate
             >
-              <UsernameBold>{senderDisplayName}</UsernameBold>
+              <UsernameBold>{partialMatrixIdToPhoneNumber(senderDisplayName)}</UsernameBold>
             </Text>
           </Username>
           {tagIconSrc && <PowerIcon size="100" iconSrc={tagIconSrc} />}
