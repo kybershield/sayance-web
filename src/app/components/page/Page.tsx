@@ -45,9 +45,9 @@ export function PageNav({ size, children }: ClientDrawerLayoutProps & css.PageNa
 }
 
 export const PageNavHeader = as<'header', css.PageNavHeaderVariants>(
-  ({ className, outlined, ...props }, ref) => (
+  ({ className, outlined, displace, ...props }, ref) => (
     <Header
-      className={classNames(css.PageNavHeader({ outlined }), className)}
+      className={classNames(css.PageNavHeader({ outlined, displace }), className)}
       // variant="Background"
       size="700"
       {...props}

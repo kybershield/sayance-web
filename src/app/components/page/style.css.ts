@@ -26,7 +26,6 @@ export const PageNavHeader = recipe({
   base: {
     padding: `0 ${config.space.S200} 0 ${config.space.S300}`,
     flexShrink: 0,
-    marginLeft: toRem(-90),
     selectors: {
       'button&': {
         cursor: 'pointer',
@@ -42,16 +41,21 @@ export const PageNavHeader = recipe({
       },
     },
   },
-
   variants: {
     outlined: {
       true: {
         borderBottomWidth: 0.3,
       },
     },
+    displace: {
+      true: {
+        marginLeft: toRem(-90),
+      },
+    },
   },
   defaultVariants: {
     outlined: true,
+    displace: true,
   },
 });
 export type PageNavHeaderVariants = RecipeVariants<typeof PageNavHeader>;
