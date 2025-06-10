@@ -41,12 +41,12 @@ export function Room() {
     <PowerLevelsContextProvider value={powerLevels}>
       <Box grow="Yes">
         <RoomView room={room} eventId={eventId} />
-        {screenSize === ScreenSize.Desktop && isDrawer && (
+        {/* {screenSize === ScreenSize.Desktop && isDrawer && (
           <>
             <Line variant="Background" direction="Vertical" size="300" />
             <MembersDrawer key={room.roomId} room={room} members={members} />
           </>
-        )}
+        )} */}
       </Box>
     </PowerLevelsContextProvider>
   );

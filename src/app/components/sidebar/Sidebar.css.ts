@@ -16,6 +16,7 @@ export const Sidebar = style([
     display: 'flex',
     flexDirection: 'column',
     color: color.Background.OnContainer,
+    marginTop: toRem(60),
   },
 ]);
 

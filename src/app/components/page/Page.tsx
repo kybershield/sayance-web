@@ -16,9 +16,9 @@ export function PageRoot({ nav, children }: PageRootProps) {
   return (
     <Box grow="Yes" className={ContainerColor({ variant: 'Background' })}>
       {nav}
-      {screenSize !== ScreenSize.Mobile && (
+      {/* {screenSize !== ScreenSize.Mobile && (
         <Line variant="Background" size="300" direction="Vertical" />
-      )}
+      )} */}
       {children}
     </Box>
   );
@@ -48,8 +48,8 @@ export const PageNavHeader = as<'header', css.PageNavHeaderVariants>(
   ({ className, outlined, ...props }, ref) => (
     <Header
       className={classNames(css.PageNavHeader({ outlined }), className)}
-      variant="Background"
-      size="600"
+      // variant="Background"
+      size="700"
       {...props}
       ref={ref}
     />
@@ -93,7 +93,7 @@ export const PageHeader = as<'div', css.PageHeaderVariants>(
   ({ className, outlined, balance, ...props }, ref) => (
     <Header
       as="header"
-      size="600"
+      size="700"
       className={classNames(css.PageHeader({ balance, outlined }), className)}
       {...props}
       ref={ref}

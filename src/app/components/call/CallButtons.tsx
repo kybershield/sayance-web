@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react';
-import { IconButton, Icon, Icons, Button } from 'folds';
+import { IconButton, Icon, Icons, Button, toRem } from 'folds';
 import { Room } from 'matrix-js-sdk';
 import { useCallState, CallType } from '../../hooks/useCallState';
 import { useRoomCall } from '../../hooks/useRoomCall';
+import VideoCallIcon from '../../../../public/icons/video-call.svg';
+import VoiceCallIcon from '../../../../public/icons/voice-call.svg';
 
 interface CallButtonsProps {
   room: Room;
@@ -61,21 +63,33 @@ export function CallButtons({ room, onElementCallStart }: CallButtonsProps) {
       {showLegacyCall && (
         <>
           <IconButton
-            variant="Background"
+            // variant="Background"
             onClick={handleVoiceCall}
             disabled={!canCall}
             aria-label="Start voice call"
+            style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
           >
-            <Icon src={Icons.Phone} size="200" />
+            {/* <Icon src={Icons.Phone} size="200" /> */}
+            <img
+              src={VoiceCallIcon}
+              alt="Voice Call"
+              style={{ width: toRem(20), height: toRem(20) }}
+            />
           </IconButton>
 
           <IconButton
-            variant="Background"
+            // variant="Background"
             onClick={handleVideoCall}
             disabled={!canCall}
             aria-label="Start video call"
+            style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
           >
-            <Icon src={Icons.Play} size="200" />
+            {/* <Icon src={Icons.Play} size="200" /> */}
+            <img
+              src={VideoCallIcon}
+              alt="Video Call"
+              style={{ width: toRem(20), height: toRem(20) }}
+            />
           </IconButton>
         </>
       )}

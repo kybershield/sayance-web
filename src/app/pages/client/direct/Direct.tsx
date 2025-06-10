@@ -52,6 +52,9 @@ import {
 } from '../../../hooks/useRoomsNotificationPreferences';
 import { VideoCall } from '../../../components/video-call/VideoCall';
 import { useRoomCall } from '../../../hooks/useRoomCall';
+import SayanceLogo from '../../../../../public/logo.svg';
+import SearchIcon from '../../../../../public/icons/search-icon.svg';
+import MenuIcon from '../../../../../public/icons/menu-icon.svg';
 
 type DirectMenuProps = {
   requestClose: () => void;
@@ -102,14 +105,29 @@ function DirectHeader() {
     <>
       <PageNavHeader>
         <Box alignItems="Center" grow="Yes" gap="300">
-          <Box grow="Yes">
+          <Box grow="Yes" alignItems="Center" gap="200">
+            <img src={SayanceLogo} alt="Sayance.io" style={{ width: '28px' }} />
             <Text size="H4" truncate>
-              Direct Messages
+              Sayance.io
             </Text>
           </Box>
-          <Box>
-            <IconButton aria-pressed={!!menuAnchor} variant="Background" onClick={handleOpenMenu}>
-              <Icon src={Icons.VerticalDots} size="200" />
+          <Box gap="300">
+            <IconButton
+              aria-pressed={!!menuAnchor}
+              variant="Background"
+              style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
+              onClick={handleOpenMenu}
+            >
+              <img src={SearchIcon} alt="Search" />
+            </IconButton>
+            <IconButton
+              aria-pressed={!!menuAnchor}
+              variant="Background"
+              onClick={handleOpenMenu}
+              style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
+            >
+              {/* <Icon src={Icons.VerticalDots} size="200" /> */}
+              <img src={MenuIcon} alt="Menu" />
             </IconButton>
           </Box>
         </Box>
@@ -340,7 +358,7 @@ export function Direct() {
 
   return (
     <PageNav>
-      {/* <DirectHeader /> */}
+      <DirectHeader />
       {noRoomToDisplay ? (
         <DirectEmpty />
       ) : (

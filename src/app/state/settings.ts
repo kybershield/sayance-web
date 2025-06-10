@@ -49,7 +49,7 @@ const defaultSettings: Settings = {
   pageZoom: 100,
   hideActivity: false,
 
-  isPeopleDrawer: true,
+  isPeopleDrawer: false,
   memberSortFilterIndex: 0,
   enterForNewline: false,
   messageLayout: 0,

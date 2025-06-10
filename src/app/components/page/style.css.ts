@@ -26,6 +26,7 @@ export const PageNavHeader = recipe({
   base: {
     padding: `0 ${config.space.S200} 0 ${config.space.S300}`,
     flexShrink: 0,
+    marginLeft: toRem(-90),
     selectors: {
       'button&': {
         cursor: 'pointer',
@@ -45,7 +46,7 @@ export const PageNavHeader = recipe({
   variants: {
     outlined: {
       true: {
-        borderBottomWidth: 1,
+        borderBottomWidth: 0.3,
       },
     },
   },
@@ -75,7 +76,8 @@ export const PageHeader = recipe({
     },
     outlined: {
       true: {
-        borderBottomWidth: config.borderWidth.B300,
+        borderBottomWidth: 0.3,
+        borderLeftWidth: 0.3,
       },
     },
   },

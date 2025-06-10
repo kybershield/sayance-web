@@ -68,6 +68,7 @@ import {
 import { VideoCall } from '../../components/video-call/VideoCall';
 import { useRoomCall } from '../../hooks/useRoomCall';
 import { CallButtons } from '../../components/call';
+import MenuIcon from '../../../../public/icons/menu-icon.svg';
 
 type RoomMenuProps = {
   room: Room;
@@ -406,7 +407,7 @@ export function RoomViewHeader() {
           {/* Replace individual call buttons with our new CallButtons component */}
           <CallButtons room={room} onElementCallStart={handleElementCallStart} />
 
-          <TooltipProvider
+          {/* <TooltipProvider
             position="Bottom"
             offset={4}
             tooltip={
@@ -442,8 +443,8 @@ export function RoomViewHeader() {
                 <Icon size="400" src={Icons.Pin} filled={!!pinMenuAnchor} />
               </IconButton>
             )}
-          </TooltipProvider>
-          <TooltipProvider
+          </TooltipProvider> */}
+          {/* <TooltipProvider
             position="Bottom"
             offset={4}
             tooltip={
@@ -457,7 +458,7 @@ export function RoomViewHeader() {
                 <Icon size="400" src={Icons.UserPlus} />
               </IconButton>
             )}
-          </TooltipProvider>
+          </TooltipProvider> */}
           <TooltipProvider
             position="Bottom"
             offset={4}
@@ -468,8 +469,14 @@ export function RoomViewHeader() {
             }
           >
             {(triggerRef) => (
-              <IconButton onClick={handleOpenMenu} ref={triggerRef} aria-pressed={!!menuAnchor}>
-                <Icon size="400" src={Icons.VerticalDots} />
+              <IconButton
+                onClick={handleOpenMenu}
+                ref={triggerRef}
+                aria-pressed={!!menuAnchor}
+                style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
+              >
+                {/* <Icon size="400" src={Icons.VerticalDots} /> */}
+                <img src={MenuIcon} alt="Menu" />
               </IconButton>
             )}
           </TooltipProvider>
