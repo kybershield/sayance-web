@@ -16,9 +16,9 @@ export function PageRoot({ nav, children }: PageRootProps) {
   return (
     <Box grow="Yes" className={ContainerColor({ variant: 'Background' })}>
       {nav}
-      {screenSize !== ScreenSize.Mobile && (
+      {/* {screenSize !== ScreenSize.Mobile && (
         <Line variant="Background" size="300" direction="Vertical" />
-      )}
+      )} */}
       {children}
     </Box>
   );
@@ -45,11 +45,11 @@ export function PageNav({ size, children }: ClientDrawerLayoutProps & css.PageNa
 }
 
 export const PageNavHeader = as<'header', css.PageNavHeaderVariants>(
-  ({ className, outlined, ...props }, ref) => (
+  ({ className, outlined, displace, ...props }, ref) => (
     <Header
-      className={classNames(css.PageNavHeader({ outlined }), className)}
-      variant="Background"
-      size="600"
+      className={classNames(css.PageNavHeader({ outlined, displace }), className)}
+      // variant="Background"
+      size="700"
       {...props}
       ref={ref}
     />
@@ -67,7 +67,7 @@ export function PageNavContent({
     <Box grow="Yes" direction="Column">
       <Scroll
         ref={scrollRef}
-        variant="Background"
+        style={{ backgroundColor: '#F4F6F9' }}
         direction="Vertical"
         size="300"
         hideTrack
@@ -93,7 +93,7 @@ export const PageHeader = as<'div', css.PageHeaderVariants>(
   ({ className, outlined, balance, ...props }, ref) => (
     <Header
       as="header"
-      size="600"
+      size="700"
       className={classNames(css.PageHeader({ balance, outlined }), className)}
       {...props}
       ref={ref}

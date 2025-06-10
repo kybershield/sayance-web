@@ -6,13 +6,17 @@ import { ContainerColor } from '../../styles/ContainerColor.css';
 export const Sidebar = style([
   DefaultReset,
   {
-    width: toRem(66),
-    backgroundColor: color.Background.Container,
-    borderRight: `${config.borderWidth.B300} solid ${color.Background.ContainerLine}`,
+    width: toRem(90),
+    paddingLeft: toRem(8),
+    paddingRight: toRem(8),
+    backgroundColor: '#FFF',
+    // backgroundColor: color.Background.Container,
+    // borderRight: `${config.borderWidth.B300} solid ${color.Background.ContainerLine}`,
 
     display: 'flex',
     flexDirection: 'column',
     color: color.Background.OnContainer,
+    marginTop: toRem(60),
   },
 ]);
 
@@ -68,33 +72,38 @@ export const SidebarItem = recipe({
   base: [
     DefaultReset,
     {
-      minWidth: toRem(42),
+      minWidth: toRem(60),
+      width: '100%',
+      aspectRatio: '1 / 1',
       display: 'flex',
       alignItems: 'center',
+      marginBottom: toRem(15),
       justifyContent: 'center',
       position: 'relative',
       transition: 'transform 200ms cubic-bezier(0, 0.8, 0.67, 0.97)',
 
-      selectors: {
-        '&:hover': {
-          transform: `translateX(${toRem(PUSH_X)})`,
-        },
-        '&::before': {
-          content: '',
-          display: 'none',
-          position: 'absolute',
-          left: toRem(-11.5 - PUSH_X),
-          width: toRem(3 + PUSH_X),
-          height: toRem(16),
-          borderRadius: `0 ${toRem(4)} ${toRem(4)} 0`,
-          background: 'CurrentColor',
-          transition: 'height 200ms linear',
-        },
-        '&:hover::before': {
-          display: 'block',
-          width: toRem(3),
-        },
-      },
+      borderRadius: config.radii.R400,
+
+      // selectors: {
+      //   '&:hover': {
+      //     transform: `translateX(${toRem(PUSH_X)})`,
+      //   },
+      //   '&::before': {
+      //     content: '',
+      //     display: 'none',
+      //     position: 'absolute',
+      //     left: toRem(-11.5 - PUSH_X),
+      //     width: toRem(3 + PUSH_X),
+      //     height: toRem(16),
+      //     borderRadius: `0 ${toRem(4)} ${toRem(4)} 0`,
+      //     background: 'CurrentColor',
+      //     transition: 'height 200ms linear',
+      //   },
+      //   '&:hover::before': {
+      //     display: 'block',
+      //     width: toRem(3),
+      //   },
+      // },
     },
     Disabled,
     DropTarget,
@@ -102,15 +111,16 @@ export const SidebarItem = recipe({
   variants: {
     active: {
       true: {
-        selectors: {
-          '&::before': {
-            display: 'block',
-            height: toRem(24),
-          },
-          '&:hover::before': {
-            width: toRem(3 + PUSH_X),
-          },
-        },
+        backgroundColor: '#F7F8FA',
+        // selectors: {
+        //   '&::before': {
+        //     display: 'block',
+        //     height: toRem(24),
+        //   },
+        //   '&:hover::before': {
+        //     width: toRem(3 + PUSH_X),
+        //   },
+        // },
       },
     },
   },
@@ -148,6 +158,11 @@ export type SidebarItemBadgeVariants = RecipeVariants<typeof SidebarItemBadge>;
 export const SidebarAvatar = recipe({
   base: [
     {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: toRem(6),
+      alignItems: 'center',
+      justifyContent: 'center',
       selectors: {
         'button&': {
           cursor: 'pointer',
@@ -172,6 +187,10 @@ export const SidebarAvatar = recipe({
         width: toRem(42),
         height: toRem(42),
       },
+      auto: {
+        width: 'auto',
+        height: 'auto',
+      },
     },
     outlined: {
       true: {
@@ -180,7 +199,7 @@ export const SidebarAvatar = recipe({
     },
   },
   defaultVariants: {
-    size: '400',
+    size: 'auto',
   },
 });
 export type SidebarAvatarVariants = RecipeVariants<typeof SidebarAvatar>;

@@ -16,6 +16,8 @@ import { AuthServerProvider } from '../../hooks/useAuthServer';
 import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
 import { BASE_URL } from '../../../util/constants';
 // import CinnySVG from '../../../../public/res/svg/cinny.svg';
+import Banner from '../../../../public/images/sign-up/banner.png';
+import SayanceLogo from '../../../../public/logo.svg';
 
 function AuthLayoutLoading({ message }: { message: string }) {
   return (
@@ -61,69 +63,102 @@ export function AuthLayout() {
   return (
     <Scroll variant="Background" visibility="Hover" size="300" hideTrack>
       <Box
-        className={classNames(css.AuthLayout, PatternsCss.BackgroundDotPattern)}
+        className={classNames(css.AuthLayout)}
+        // className={classNames(css.AuthLayout, PatternsCss.BackgroundDotPattern)}
         direction="Column"
-        alignItems="Center"
-        justifyContent="SpaceBetween"
-        gap="400"
       >
-        <Box direction="Column" className={css.AuthCard}>
-          <Header className={css.AuthHeader} size="600" variant="Surface">
-            <Box grow="Yes" direction="Row" gap="300" alignItems="Center">
-              {/* <img className={css.AuthLogo} src={CinnySVG} alt="Cinny Logo" /> */}
-              <Text size="H3">Sayance</Text>
+        {/* Split Layout Container */}
+        <Box className={css.AuthSplitContainer} direction="Row">
+          {/* Left Side - Marketing Content */}
+          <Box className={css.AuthLeftSide} direction="Column" gap="500">
+            <Box direction="Column" gap="400">
+              <Box direction="Row" gap="200" alignItems="Center">
+                <img src={SayanceLogo} alt="Sayance Logo" style={{ width: '40px' }} />
+                <Text size="H4" priority="400">
+                  Sayance.io
+                </Text>
+              </Box>
+
+              <Text size="H1" priority="400">
+                Private Conversations, <br /> Made Simple.
+              </Text>
+              <Text size="T400" priority="300" style={{ lineHeight: '1.6' }}>
+                Sayance is your secure space to enjoy fast, private messaging and calls, with
+                end-to-end encryption. No data mining or tracking — just privacy by design.
+              </Text>
             </Box>
-          </Header>
-          <Box className={css.AuthCardContent} direction="Column">
-            {discoveryState.status === AsyncStatus.Loading && (
-              <AuthLayoutLoading message="Connecting to server..." />
-            )}
-            {discoveryState.status === AsyncStatus.Error && (
-              <AuthLayoutError message="Failed to connect to server." />
-            )}
-            {autoDiscoveryError?.action === AutoDiscoveryAction.FAIL_PROMPT && (
-              <AuthLayoutError
-                message={`Failed to connect. Homeserver configuration found with ${autoDiscoveryError.host} appears unusable.`}
-              />
-            )}
-            {autoDiscoveryError?.action === AutoDiscoveryAction.FAIL_ERROR && (
-              <AuthLayoutError message="Failed to connect. Homeserver configuration base_url appears invalid." />
-            )}
-            {discoveryState.status === AsyncStatus.Success && autoDiscoveryInfo && (
-              <AuthServerProvider value={discoveryState.data.serverName}>
-                <AutoDiscoveryInfoProvider value={autoDiscoveryInfo}>
-                  <SpecVersionsLoader
-                    baseUrl={BASE_URL}
-                    fallback={() => <AuthLayoutLoading message={`Connecting to ${BASE_URL}`} />}
-                    error={() => (
-                      <AuthLayoutError message="Failed to connect. Either server is unavailable at this moment or does not exist." />
-                    )}
-                  >
-                    {(specVersions) => (
-                      <SpecVersionsProvider value={specVersions}>
-                        <AuthFlowsLoader
+            {/* Image Placeholder */}
+            <img
+              src={Banner}
+              style={{ width: '100%', aspectRatio: '1/0.8', objectFit: 'cover' }}
+              alt="Sayance banner"
+              loading="lazy"
+            />
+          </Box>
+
+          {/* Right Side - Login Form */}
+          <Box className={css.AuthRightSide} direction="Column">
+            <Box direction="Column" style={{ width: '100%', maxWidth: '460px' }}>
+              <Box direction="Column" className={css.AuthCard}>
+                <Box className={css.AuthCardContent} direction="Column">
+                  {discoveryState.status === AsyncStatus.Loading && (
+                    <AuthLayoutLoading message="Connecting to server..." />
+                  )}
+                  {discoveryState.status === AsyncStatus.Error && (
+                    <AuthLayoutError message="Failed to connect to server." />
+                  )}
+                  {autoDiscoveryError?.action === AutoDiscoveryAction.FAIL_PROMPT && (
+                    <AuthLayoutError
+                      message={`Failed to connect. Homeserver configuration found with ${autoDiscoveryError.host} appears unusable.`}
+                    />
+                  )}
+                  {autoDiscoveryError?.action === AutoDiscoveryAction.FAIL_ERROR && (
+                    <AuthLayoutError message="Failed to connect. Homeserver configuration base_url appears invalid." />
+                  )}
+                  {discoveryState.status === AsyncStatus.Success && autoDiscoveryInfo && (
+                    <AuthServerProvider value={discoveryState.data.serverName}>
+                      <AutoDiscoveryInfoProvider value={autoDiscoveryInfo}>
+                        <SpecVersionsLoader
+                          baseUrl={BASE_URL}
                           fallback={() => (
-                            <AuthLayoutLoading message="Loading authentication flow..." />
+                            <AuthLayoutLoading message={`Connecting to ${BASE_URL}`} />
                           )}
                           error={() => (
-                            <AuthLayoutError message="Failed to get authentication flow information." />
+                            <AuthLayoutError message="Failed to connect. Either server is unavailable at this moment or does not exist." />
                           )}
                         >
-                          {(authFlows) => (
-                            <AuthFlowsProvider value={authFlows}>
-                              <Outlet />
-                            </AuthFlowsProvider>
+                          {(specVersions) => (
+                            <SpecVersionsProvider value={specVersions}>
+                              <AuthFlowsLoader
+                                fallback={() => (
+                                  <AuthLayoutLoading message="Loading authentication flow..." />
+                                )}
+                                error={() => (
+                                  <AuthLayoutError message="Failed to get authentication flow information." />
+                                )}
+                              >
+                                {(authFlows) => (
+                                  <AuthFlowsProvider value={authFlows}>
+                                    <Outlet />
+                                  </AuthFlowsProvider>
+                                )}
+                              </AuthFlowsLoader>
+                            </SpecVersionsProvider>
                           )}
-                        </AuthFlowsLoader>
-                      </SpecVersionsProvider>
-                    )}
-                  </SpecVersionsLoader>
-                </AutoDiscoveryInfoProvider>
-              </AuthServerProvider>
-            )}
+                        </SpecVersionsLoader>
+                      </AutoDiscoveryInfoProvider>
+                    </AuthServerProvider>
+                  )}
+                </Box>
+              </Box>
+
+              {/* Footer positioned at bottom of right side */}
+              {/* <Box style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+                <AuthFooter />
+              </Box> */}
+            </Box>
           </Box>
         </Box>
-        <AuthFooter />
       </Box>
     </Scroll>
   );

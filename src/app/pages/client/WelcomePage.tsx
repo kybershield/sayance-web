@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, config } from 'folds';
 import { Page, PageHero, PageHeroSection } from '../../components/page';
-import CinnySVG from '../../../../public/res/svg/cinny.svg';
+import SayanceLogo from '../../../../public/logo.svg';
 
 export function WelcomePage() {
   return (
@@ -14,11 +14,11 @@ export function WelcomePage() {
       >
         <PageHeroSection>
           <PageHero
-            icon={<img width="70" height="70" src={CinnySVG} alt="Cinny Logo" />}
+            icon={<img width="70" height="70" src={SayanceLogo} alt="Sayance Logo" />}
             title="Welcome to Sayance"
             subTitle={
               <span>
-                End to end encrypted chat app by Kybershield.
+                End to end encrypted messaging application.
                 {/* <a
                   href="https://github.com/cinnyapp/cinny/releases"
                   target="_blank"

@@ -65,6 +65,10 @@ import {
   getRoomNotificationModeIcon,
   useRoomsNotificationPreferencesContext,
 } from '../../hooks/useRoomsNotificationPreferences';
+import { VideoCall } from '../../components/video-call/VideoCall';
+import { useRoomCall } from '../../hooks/useRoomCall';
+import { CallButtons } from '../../components/call';
+import MenuIcon from '../../../../public/icons/menu-icon.svg';
 
 type RoomMenuProps = {
   room: Room;
@@ -218,8 +222,10 @@ export function RoomViewHeader() {
   const space = useSpaceOptionally();
   const [menuAnchor, setMenuAnchor] = useState<RectCords>();
   const [pinMenuAnchor, setPinMenuAnchor] = useState<RectCords>();
+  const [elementCallRoomId, setElementCallRoomId] = useState<string | null>(null);
   const mDirects = useAtomValue(mDirectAtom);
 
+  const callInfo = useRoomCall(room);
   const pinnedEvents = useRoomPinnedEvents(room);
   const encryptionEvent = useStateEvent(room, StateEvent.RoomEncryption);
   const ecryptedRoom = !!encryptionEvent;
@@ -248,6 +254,14 @@ export function RoomViewHeader() {
 
   const handleOpenPinMenu: MouseEventHandler<HTMLButtonElement> = (evt) => {
     setPinMenuAnchor(evt.currentTarget.getBoundingClientRect());
+  };
+
+  const handleElementCallStart = (roomId: string) => {
+    setElementCallRoomId(roomId);
+  };
+
+  const handleElementCallClose = () => {
+    setElementCallRoomId(null);
   };
 
   return (
@@ -323,6 +337,53 @@ export function RoomViewHeader() {
               </UseStateProvider>
             )}
           </Box>
+
+          {/* Call Status Indicator */}
+          {callInfo.isCallActive && (
+            <Box
+              direction="Row"
+              alignItems="Center"
+              gap="200"
+              style={{
+                padding: '4px 8px',
+                background: 'var(--bg-surface-300)',
+                borderRadius: '12px',
+                border: '1px solid var(--bg-surface-400)',
+              }}
+            >
+              <Icon size="300" src={Icons.Play} style={{ color: 'var(--accent-brand)' }} />
+              <Text size="T300" style={{ color: 'var(--accent-brand)' }}>
+                Call in progress ({callInfo.participantCount})
+              </Text>
+              {callInfo.canJoinCall && (
+                <TooltipProvider
+                  position="Bottom"
+                  offset={4}
+                  tooltip={
+                    <Tooltip>
+                      <Text>Join Call</Text>
+                    </Tooltip>
+                  }
+                >
+                  {(triggerRef) => (
+                    <IconButton
+                      ref={triggerRef}
+                      size="300"
+                      onClick={() => handleElementCallStart(room.roomId)}
+                      style={{
+                        backgroundColor: 'var(--accent-brand)',
+                        color: 'white',
+                        minWidth: 'auto',
+                        padding: '4px',
+                      }}
+                    >
+                      <Icon size="300" src={Icons.ArrowGoRight} />
+                    </IconButton>
+                  )}
+                </TooltipProvider>
+              )}
+            </Box>
+          )}
         </Box>
         <Box shrink="No">
           {!ecryptedRoom && (
@@ -342,7 +403,11 @@ export function RoomViewHeader() {
               )}
             </TooltipProvider>
           )}
-          <TooltipProvider
+
+          {/* Replace individual call buttons with our new CallButtons component */}
+          <CallButtons room={room} onElementCallStart={handleElementCallStart} />
+
+          {/* <TooltipProvider
             position="Bottom"
             offset={4}
             tooltip={
@@ -378,59 +443,51 @@ export function RoomViewHeader() {
                 <Icon size="400" src={Icons.Pin} filled={!!pinMenuAnchor} />
               </IconButton>
             )}
-          </TooltipProvider>
-          <PopOut
-            anchor={pinMenuAnchor}
+          </TooltipProvider> */}
+          {/* <TooltipProvider
             position="Bottom"
-            content={
-              <FocusTrap
-                focusTrapOptions={{
-                  initialFocus: false,
-                  returnFocusOnDeactivate: false,
-                  onDeactivate: () => setPinMenuAnchor(undefined),
-                  clickOutsideDeactivates: true,
-                  isKeyForward: (evt: KeyboardEvent) => evt.key === 'ArrowDown',
-                  isKeyBackward: (evt: KeyboardEvent) => evt.key === 'ArrowUp',
-                  escapeDeactivates: stopPropagation,
-                }}
-              >
-                <RoomPinMenu room={room} requestClose={() => setPinMenuAnchor(undefined)} />
-              </FocusTrap>
-            }
-          />
-          {screenSize === ScreenSize.Desktop && (
-            <TooltipProvider
-              position="Bottom"
-              offset={4}
-              tooltip={
-                <Tooltip>
-                  <Text>Members</Text>
-                </Tooltip>
-              }
-            >
-              {(triggerRef) => (
-                <IconButton ref={triggerRef} onClick={() => setPeopleDrawer((drawer) => !drawer)}>
-                  <Icon size="400" src={Icons.User} />
-                </IconButton>
-              )}
-            </TooltipProvider>
-          )}
-          <TooltipProvider
-            position="Bottom"
-            align="End"
             offset={4}
             tooltip={
               <Tooltip>
-                <Text>More Options</Text>
+                <Text>People</Text>
               </Tooltip>
             }
           >
             {(triggerRef) => (
-              <IconButton onClick={handleOpenMenu} ref={triggerRef} aria-pressed={!!menuAnchor}>
-                <Icon size="400" src={Icons.VerticalDots} filled={!!menuAnchor} />
+              <IconButton ref={triggerRef} onClick={() => setPeopleDrawer((drawer) => !drawer)}>
+                <Icon size="400" src={Icons.UserPlus} />
+              </IconButton>
+            )}
+          </TooltipProvider> */}
+          <TooltipProvider
+            position="Bottom"
+            offset={4}
+            tooltip={
+              <Tooltip>
+                <Text>Options</Text>
+              </Tooltip>
+            }
+          >
+            {(triggerRef) => (
+              <IconButton
+                onClick={handleOpenMenu}
+                ref={triggerRef}
+                aria-pressed={!!menuAnchor}
+                style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
+              >
+                {/* <Icon size="400" src={Icons.VerticalDots} /> */}
+                <img src={MenuIcon} alt="Menu" />
               </IconButton>
             )}
           </TooltipProvider>
+
+          <PopOut
+            anchor={pinMenuAnchor}
+            position="Bottom"
+            align="End"
+            content={<RoomPinMenu room={room} requestClose={() => setPinMenuAnchor(undefined)} />}
+          />
+
           <PopOut
             anchor={menuAnchor}
             position="Bottom"
@@ -453,6 +510,15 @@ export function RoomViewHeader() {
           />
         </Box>
       </Box>
+
+      {/* Video Call Modal */}
+      {elementCallRoomId && (
+        <VideoCall
+          roomId={elementCallRoomId}
+          isOpen={!!elementCallRoomId}
+          onClose={handleElementCallClose}
+        />
+      )}
     </PageHeader>
   );
 }

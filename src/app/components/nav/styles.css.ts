@@ -56,16 +56,18 @@ const NavItemBase = style({
 
   selectors: {
     '&:hover, &:focus-visible': {
-      backgroundColor: ContainerHover,
+      backgroundColor: '#EEEDFFB2',
     },
     '&[data-hover=true]': {
-      backgroundColor: ContainerHover,
+      backgroundColor: '#EEEDFFB2',
+      // backgroundColor: ContainerHover,
     },
     [`&:has(.${NavLink}:active)`]: {
-      backgroundColor: ContainerActive,
+      backgroundColor: '#EEEDFFB2',
     },
     '&[aria-selected=true]': {
-      backgroundColor: ContainerActive,
+      backgroundColor: '#EEEDFFB2',
+      // backgroundColor: ContainerActive,
     },
     [`&:has(.${NavLink}:focus-visible)`]: {
       outline: `${config.borderWidth.B600} solid ${ContainerLine}`,
@@ -104,8 +106,10 @@ export const NavItem = recipe({
 
 export type RoomSelectorVariants = RecipeVariants<typeof NavItem>;
 export const NavItemContent = style({
-  paddingLeft: config.space.S200,
+  paddingLeft: config.space.S300,
   paddingRight: config.space.S300,
+  paddingTop: config.space.S300,
+  paddingBottom: config.space.S300,
   height: 'inherit',
   minWidth: 0,
   flexGrow: 1,

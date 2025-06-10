@@ -7,7 +7,8 @@ export const RoomNavCategoryButton = as<'button', { closed?: boolean }>(
   ({ className, closed, children, ...props }, ref) => (
     <Chip
       className={classNames(css.CategoryButton, className)}
-      variant="Background"
+      // variant="Background"
+      style={{ backgroundColor: 'transparent' }}
       radii="Pill"
       before={
         <Icon

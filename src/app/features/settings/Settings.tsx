@@ -126,7 +126,7 @@ export function Settings({ initialPage, requestClose }: SettingsProps) {
       nav={
         screenSize === ScreenSize.Mobile && activePage !== undefined ? undefined : (
           <PageNav size="300">
-            <PageNavHeader outlined={false}>
+            <PageNavHeader outlined={false} displace={false}>
               <Box grow="Yes" gap="200">
                 <Avatar size="200" radii="300">
                   <UserAvatar

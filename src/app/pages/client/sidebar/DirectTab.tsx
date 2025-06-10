@@ -25,6 +25,8 @@ import { markAsRead } from '../../../../client/action/notifications';
 import { stopPropagation } from '../../../utils/keyboard';
 import { settingsAtom } from '../../../state/settings';
 import { useSetting } from '../../../state/hooks/settings';
+import ChatIcon from '../../../../../public/icons/chat.svg';
+import ChatFilledIcon from '../../../../../public/icons/chat-filled.svg';
 
 type DirectMenuProps = {
   requestClose: () => void;
@@ -98,11 +100,15 @@ export function DirectTab() {
           <SidebarAvatar
             as="button"
             ref={triggerRef}
-            outlined
+            // bordered={directSelected}
             onClick={handleDirectClick}
             onContextMenu={handleContextMenu}
           >
-            <Icon src={Icons.User} filled={directSelected} />
+            {/* <Icon src={Icons.Message} filled={directSelected} /> */}
+            {directSelected ? <img src={ChatFilledIcon} /> : <img src={ChatIcon} />}
+            <Text style={{ color: directSelected ? '#000' : '#75808A', fontSize: toRem(12) }}>
+              Chats
+            </Text>
           </SidebarAvatar>
         )}
       </SidebarItemTooltip>

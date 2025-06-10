@@ -27,7 +27,7 @@ export const silverTheme = createTheme(color, {
   },
 
   Primary: {
-    Main: '#1245A8',
+    Main: '#4553F3',
     MainHover: '#103E97',
     MainActive: '#0F3B8F',
     MainLine: '#0E3786',

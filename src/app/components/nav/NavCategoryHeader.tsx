@@ -10,7 +10,8 @@ export const NavCategoryHeader = as<'div', NavCategoryHeaderProps>(
   ({ className, ...props }, ref) => (
     <Header
       className={classNames(css.NavCategoryHeader, className)}
-      variant="Background"
+      // variant="Background"
+      style={{ backgroundColor: 'transparent' }}
       size="300"
       {...props}
       ref={ref}

@@ -9,4 +9,5 @@ export const SplashScreen = style({
 
 export const SplashScreenFooter = style({
   padding: config.space.S400,
+  gap: config.space.S200,
 });
