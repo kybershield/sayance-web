@@ -90,7 +90,7 @@ const DirectMenu = forwardRef<HTMLDivElement, DirectMenuProps>(({ requestClose }
   );
 });
 
-function DirectHeader() {
+function DirectHeader({ openInviteUser }: { openInviteUser: () => void }) {
   const [menuAnchor, setMenuAnchor] = useState<RectCords>();
 
   const handleOpenMenu: MouseEventHandler<HTMLButtonElement> = (evt) => {
@@ -116,7 +116,7 @@ function DirectHeader() {
               aria-pressed={!!menuAnchor}
               variant="Background"
               style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
-              onClick={handleOpenMenu}
+              onClick={openInviteUser}
             >
               <img src={SearchIcon} alt="Search" />
             </IconButton>
@@ -358,13 +358,13 @@ export function Direct() {
 
   return (
     <PageNav>
-      <DirectHeader />
+      <DirectHeader openInviteUser={openInviteUser} />
       {noRoomToDisplay ? (
         <DirectEmpty />
       ) : (
         <PageNavContent scrollRef={scrollRef}>
           <Box direction="Column" gap="300">
-            <NavCategory>
+            {/* <NavCategory>
               <NavItem radii="400">
                 <NavButton onClick={() => openInviteUser()}>
                   <NavItemContent>
@@ -381,7 +381,7 @@ export function Direct() {
                   </NavItemContent>
                 </NavButton>
               </NavItem>
-            </NavCategory>
+            </NavCategory> */}
             <NavCategory>
               <NavCategoryHeader>
                 <RoomNavCategoryButton
