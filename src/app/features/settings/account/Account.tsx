@@ -47,14 +47,16 @@ import { ModalWide } from '../../../styles/Modal.css';
 import { createUploadAtom, UploadSuccess } from '../../../state/upload';
 import { CompactUploadCardRenderer } from '../../../components/upload-card';
 import { useCapabilities } from '../../../hooks/useCapabilities';
+import { matrixIdToPhoneNumber } from '../../../../util/functionsUtil';
 
 function MatrixId() {
   const mx = useMatrixClient();
   const userId = mx.getUserId()!;
+  const formattedUserId = matrixIdToPhoneNumber(userId);
 
   return (
     <Box direction="Column" gap="100">
-      <Text size="L400">Matrix ID</Text>
+      <Text size="L400">Sayance ID</Text>
       <SequenceCard
         className={SequenceCardStyle}
         variant="SurfaceVariant"
@@ -62,9 +64,9 @@ function MatrixId() {
         gap="400"
       >
         <SettingTile
-          title={userId}
+          title={formattedUserId}
           after={
-            <Chip variant="Secondary" radii="Pill" onClick={() => copyToClipboard(userId)}>
+            <Chip variant="Secondary" radii="Pill" onClick={() => copyToClipboard(formattedUserId)}>
               <Text size="T200">Copy</Text>
             </Chip>
           }
@@ -236,11 +238,16 @@ function ProfileAvatar({ profile, userId }: ProfileProps) {
 }
 
 function ProfileDisplayName({ profile, userId }: ProfileProps) {
+  console.log({ userId });
+  const formattedUserId = matrixIdToPhoneNumber(userId);
   const mx = useMatrixClient();
   const capabilities = useCapabilities();
   const disableSetDisplayname = capabilities['m.set_displayname']?.enabled === false;
 
-  const defaultDisplayName = profile.displayName ?? getMxIdLocalPart(userId) ?? userId;
+  const defaultDisplayName =
+    profile.displayName && profile.displayName !== userId
+      ? profile.displayName
+      : matrixIdToPhoneNumber(userId);
   const [displayName, setDisplayName] = useState<string>(defaultDisplayName);
 
   const [changeState, changeDisplayName] = useAsyncCallback(
@@ -272,6 +279,12 @@ function ProfileDisplayName({ profile, userId }: ProfileProps) {
 
     changeDisplayName(name);
   };
+  console.log({
+    changeDisplayName,
+    disableSetDisplayname,
+    defaultDisplayName,
+    name: profile.displayName,
+  });
 
   const hasChanges = displayName !== defaultDisplayName;
   return (
@@ -418,7 +431,7 @@ export function Account({ requestClose }: AccountProps) {
             <Box direction="Column" gap="700">
               <Profile />
               <MatrixId />
-              <ContactInformation />
+              {/* <ContactInformation /> */}
             </Box>
           </PageContent>
         </Scroll>

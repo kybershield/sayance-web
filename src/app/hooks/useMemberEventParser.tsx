@@ -4,6 +4,7 @@ import { MatrixEvent } from 'matrix-js-sdk';
 import { IMemberContent, Membership } from '../../types/matrix/room';
 import { getMxIdLocalPart } from '../utils/matrix';
 import { isMembershipChanged } from '../utils/room';
+import { partialMatrixIdToPhoneNumber } from '../../util/functionsUtil';
 
 export type ParsedResult = {
   icon: IconSrc;
@@ -39,9 +40,9 @@ export const useMemberEventParser = (): MemberEventParser => {
             icon: Icons.ArrowGoRightPlus,
             body: (
               <>
-                <b>{senderName}</b>
+                <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
                 {' accepted '}
-                <b>{userName}</b>
+                <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
                 {`'s join request `}
                 {reason}
               </>
@@ -53,9 +54,9 @@ export const useMemberEventParser = (): MemberEventParser => {
           icon: Icons.ArrowGoRightPlus,
           body: (
             <>
-              <b>{senderName}</b>
+              <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
               {' invited '}
-              <b>{userName}</b> {reason}
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b> {reason}
             </>
           ),
         };
@@ -66,7 +67,7 @@ export const useMemberEventParser = (): MemberEventParser => {
           icon: Icons.ArrowGoRightPlus,
           body: (
             <>
-              <b>{userName}</b>
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
               {' request to join room '}
               {reason}
             </>
@@ -79,7 +80,7 @@ export const useMemberEventParser = (): MemberEventParser => {
           icon: Icons.ArrowGoRight,
           body: (
             <>
-              <b>{userName}</b>
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
               {' joined the room'}
             </>
           ),
@@ -93,15 +94,15 @@ export const useMemberEventParser = (): MemberEventParser => {
             body:
               senderId === userId ? (
                 <>
-                  <b>{userName}</b>
+                  <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
                   {' rejected the invitation '}
                   {reason}
                 </>
               ) : (
                 <>
-                  <b>{senderName}</b>
+                  <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
                   {' rejected '}
-                  <b>{userName}</b>
+                  <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
                   {`'s join request `}
                   {reason}
                 </>
@@ -115,15 +116,15 @@ export const useMemberEventParser = (): MemberEventParser => {
             body:
               senderId === userId ? (
                 <>
-                  <b>{userName}</b>
+                  <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
                   {' revoked joined request '}
                   {reason}
                 </>
               ) : (
                 <>
-                  <b>{senderName}</b>
+                  <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
                   {' revoked '}
-                  <b>{userName}</b>
+                  <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
                   {`'s invite `}
                   {reason}
                 </>
@@ -136,9 +137,9 @@ export const useMemberEventParser = (): MemberEventParser => {
             icon: Icons.ArrowGoLeft,
             body: (
               <>
-                <b>{senderName}</b>
+                <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
                 {' unbanned '}
-                <b>{userName}</b> {reason}
+                <b>{partialMatrixIdToPhoneNumber(userName || '')}</b> {reason}
               </>
             ),
           };
@@ -149,15 +150,15 @@ export const useMemberEventParser = (): MemberEventParser => {
           body:
             senderId === userId ? (
               <>
-                <b>{userName}</b>
+                <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
                 {' left the room '}
                 {reason}
               </>
             ) : (
               <>
-                <b>{senderName}</b>
+                <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
                 {' kicked '}
-                <b>{userName}</b> {reason}
+                <b>{partialMatrixIdToPhoneNumber(userName || '')}</b> {reason}
               </>
             ),
         };
@@ -168,9 +169,9 @@ export const useMemberEventParser = (): MemberEventParser => {
           icon: Icons.ArrowGoLeft,
           body: (
             <>
-              <b>{senderName}</b>
+              <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
               {' banned '}
-              <b>{userName}</b> {reason}
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b> {reason}
             </>
           ),
         };
@@ -188,13 +189,13 @@ export const useMemberEventParser = (): MemberEventParser => {
         body:
           typeof content.displayname === 'string' ? (
             <>
-              <b>{prevUserName}</b>
+              <b>{partialMatrixIdToPhoneNumber(prevUserName || '')}</b>
               {' changed display name to '}
-              <b>{userName}</b>
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
             </>
           ) : (
             <>
-              <b>{prevUserName}</b>
+              <b>{partialMatrixIdToPhoneNumber(prevUserName || '')}</b>
               {' removed their display name '}
             </>
           ),
@@ -206,12 +207,12 @@ export const useMemberEventParser = (): MemberEventParser => {
         body:
           content.avatar_url && typeof content.avatar_url === 'string' ? (
             <>
-              <b>{userName}</b>
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
               {' changed their avatar'}
             </>
           ) : (
             <>
-              <b>{userName}</b>
+              <b>{partialMatrixIdToPhoneNumber(userName || '')}</b>
               {' removed their avatar '}
             </>
           ),

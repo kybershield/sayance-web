@@ -53,41 +53,41 @@ type SettingsMenuItem = {
 const useSettingsMenuItems = (): SettingsMenuItem[] =>
   useMemo(
     () => [
-      {
-        page: SettingsPages.GeneralPage,
-        name: 'General',
-        icon: Icons.Setting,
-      },
+      // {
+      //   page: SettingsPages.GeneralPage,
+      //   name: 'General',
+      //   icon: Icons.Setting,
+      // },
       {
         page: SettingsPages.AccountPage,
         name: 'Account',
         icon: Icons.User,
       },
-      {
-        page: SettingsPages.NotificationPage,
-        name: 'Notifications',
-        icon: Icons.Bell,
-      },
+      // {
+      //   page: SettingsPages.NotificationPage,
+      //   name: 'Notifications',
+      //   icon: Icons.Bell,
+      // },
       {
         page: SettingsPages.DevicesPage,
         name: 'Devices',
         icon: Icons.Category,
       },
-      {
-        page: SettingsPages.EmojisStickersPage,
-        name: 'Emojis & Stickers',
-        icon: Icons.Smile,
-      },
-      {
-        page: SettingsPages.DeveloperToolsPage,
-        name: 'Developer Tools',
-        icon: Icons.Terminal,
-      },
-      {
-        page: SettingsPages.AboutPage,
-        name: 'About',
-        icon: Icons.Info,
-      },
+      // {
+      //   page: SettingsPages.EmojisStickersPage,
+      //   name: 'Emojis & Stickers',
+      //   icon: Icons.Smile,
+      // },
+      // {
+      //   page: SettingsPages.DeveloperToolsPage,
+      //   name: 'Developer Tools',
+      //   icon: Icons.Terminal,
+      // },
+      // {
+      //   page: SettingsPages.AboutPage,
+      //   name: 'About',
+      //   icon: Icons.Info,
+      // },
     ],
     []
   );
@@ -109,7 +109,7 @@ export function Settings({ initialPage, requestClose }: SettingsProps) {
   const screenSize = useScreenSizeContext();
   const [activePage, setActivePage] = useState<SettingsPages | undefined>(() => {
     if (initialPage) return initialPage;
-    return screenSize === ScreenSize.Mobile ? undefined : SettingsPages.GeneralPage;
+    return screenSize === ScreenSize.Mobile ? undefined : SettingsPages.AccountPage;
   });
   const menuItems = useSettingsMenuItems();
 

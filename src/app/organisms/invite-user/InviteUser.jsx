@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
+import { Box } from 'folds';
 import './InviteUser.scss';
 
 import * as roomActions from '../../../client/action/room';
@@ -9,7 +11,7 @@ import Text from '../../atoms/text/Text';
 import Button from '../../atoms/button/Button';
 import IconButton from '../../atoms/button/IconButton';
 import Spinner from '../../atoms/spinner/Spinner';
-import Input from '../../atoms/input/Input';
+import { Input } from 'folds';
 import PopupWindow from '../../molecules/popup-window/PopupWindow';
 import RoomTile from '../../molecules/room-tile/RoomTile';
 
@@ -19,6 +21,76 @@ import { useRoomNavigate } from '../../hooks/useRoomNavigate';
 import { getDMRoomFor } from '../../utils/matrix';
 import { useMatrixClient } from '../../hooks/useMatrixClient';
 import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
+import {
+  matrixIdToPhoneNumber,
+  partialMatrixIdToPhoneNumber,
+  phoneNumberToMatrixId,
+} from '../../../util/functionsUtil';
+
+// Generate country list from libphonenumber-js
+const COUNTRIES = getCountries()
+  .map((countryCode) => {
+    const callingCode = getCountryCallingCode(countryCode);
+    let countryName = '';
+    try {
+      countryName =
+        new Intl.DisplayNames(['en'], { type: 'region' }).of(countryCode) || countryCode;
+    } catch (e) {
+      countryName = countryCode;
+    }
+    return {
+      value: countryCode,
+      label: `${countryName} (+${callingCode})`,
+      callingCode,
+    };
+  })
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+// Custom styled select that works in both light and dark mode
+function StyledSelect({ value, onChange, children }) {
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <Box
+        as="select"
+        value={value}
+        onChange={onChange}
+        style={{
+          padding: '14px',
+          borderRadius: '4px',
+          width: '100%',
+          appearance: 'none',
+          backgroundColor: 'var(--bg-surface-low)',
+          color: 'var(--tc-surface-high)',
+          border: '1px solid var(--bg-surface-border)',
+          fontSize: '14px',
+          cursor: 'pointer',
+          paddingRight: '32px',
+        }}
+      >
+        {children}
+      </Box>
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          right: '12px',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+        }}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M6 9L2 5H10L6 9Z" fill="currentColor" />
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
   const [isSearching, updateIsSearching] = useState(false);
@@ -34,10 +106,28 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
 
   const [invitedUserIds, updateInvitedUserIds] = useState(new Set());
 
+  // Phone number input states
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [country, setCountry] = useState('US');
+  const [placeholder, setPlaceholder] = useState('');
+
   const usernameRef = useRef(null);
 
   const mx = useMatrixClient();
   const { navigateRoom } = useRoomNavigate();
+
+  // Update placeholder when country changes
+  useEffect(() => {
+    try {
+      setPlaceholder(`+${getCountryCallingCode(country)}`);
+    } catch (e) {
+      setPlaceholder(`+${getCountryCallingCode(country)}`);
+    }
+  }, [country]);
+
+  const handleCountryChange = (e) => {
+    setCountry(e.target.value);
+  };
 
   function getMapCopy(myMap) {
     const newMap = new Map();
@@ -68,7 +158,8 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
   }
 
   async function searchUser(username) {
-    const inputUsername = username.trim();
+    const phone = username.trim();
+    const inputUsername = phoneNumberToMatrixId(phone);
     if (isSearching || inputUsername === '' || inputUsername === searchQuery.username) return;
     const isInputUserId = inputUsername[0] === '@' && inputUsername.indexOf(':') > 1;
     updateIsSearching(true);
@@ -219,6 +310,7 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
     return users.map((user) => {
       const userId = user.user_id;
       const name = typeof user.display_name === 'string' ? user.display_name : userId;
+      console.log({ user, userId });
       return (
         <RoomTile
           key={userId}
@@ -235,8 +327,8 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
                 )
               : null
           }
-          name={name}
-          id={userId}
+          name={partialMatrixIdToPhoneNumber(name)}
+          id={matrixIdToPhoneNumber(userId)}
           options={renderOptions(userId)}
           desc={renderError(userId)}
         />
@@ -245,7 +337,15 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
   }
 
   useEffect(() => {
-    if (isOpen && typeof searchTerm === 'string') searchUser(searchTerm);
+    if (isOpen && typeof searchTerm === 'string') {
+      // If searchTerm is provided, try to parse it as a phone number
+      if (searchTerm.startsWith('+')) {
+        // Extract just the number part for the input
+        const numberOnly = searchTerm.substring(1);
+        setPhoneNumber(numberOnly);
+      }
+      searchUser(searchTerm);
+    }
     return () => {
       updateIsSearching(false);
       updateSearchQuery({});
@@ -255,6 +355,8 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
       updateCreatedDM(new Map());
       updateRoomIdToUserId(new Map());
       updateInvitedUserIds(new Set());
+      setPhoneNumber('');
+      setCountry('US');
     };
   }, [isOpen, searchTerm]);
 
@@ -270,23 +372,63 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
           className="invite-user__form"
           onSubmit={(e) => {
             e.preventDefault();
-            searchUser(usernameRef.current.value);
+            const fullPhoneNumber = `+${getCountryCallingCode(country)}${phoneNumber}`;
+            searchUser(fullPhoneNumber);
           }}
         >
-          <Input value={searchTerm} forwardRef={usernameRef} label="Phone number" />
-          <Button disabled={isSearching} iconSrc={UserIC} variant="primary" type="submit">
-            Search
-          </Button>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'end' }}>
+            <div style={{ flex: '1', minWidth: '200px' }}>
+              <Text style={{ marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                Country
+              </Text>
+              <StyledSelect value={country} onChange={handleCountryChange}>
+                {COUNTRIES.map((countryOption) => (
+                  <option key={countryOption.value} value={countryOption.value}>
+                    {countryOption.label}
+                  </option>
+                ))}
+              </StyledSelect>
+            </div>
+            <div style={{ flex: '1' }}>
+              <Text style={{ marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                Phone Number
+              </Text>
+              <Input
+                value={phoneNumber}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  console.log({ val });
+                  setPhoneNumber(val);
+                }}
+                placeholder={placeholder}
+                inputMode="numeric"
+                outlined
+                size="500"
+                variant="Background"
+                label=""
+                // forwardRef={usernameRef}
+              />
+            </div>
+            <div style={{ flexShrink: 0 }}>
+              <Button disabled={isSearching} iconSrc={UserIC} variant="primary" type="submit">
+                Search
+              </Button>
+            </div>
+          </div>
         </form>
         <div className="invite-user__search-status">
           {typeof searchQuery.username !== 'undefined' && isSearching && (
             <div className="flex--center">
               <Spinner size="small" />
-              <Text variant="b2">{`Searching for user "${searchQuery.username}"...`}</Text>
+              <Text variant="b2">{`Searching for user "${matrixIdToPhoneNumber(
+                searchQuery.username
+              )}"...`}</Text>
             </div>
           )}
           {typeof searchQuery.username !== 'undefined' && !isSearching && (
-            <Text variant="b2">{`Search result for user "${searchQuery.username}"`}</Text>
+            <Text variant="b2">{`Search result for user "${matrixIdToPhoneNumber(
+              searchQuery.username
+            )}"`}</Text>
           )}
           {searchQuery.error && (
             <Text className="invite-user__search-error" variant="b2">

@@ -94,6 +94,7 @@ import { useTheme } from '../../../hooks/useTheme';
 import { PowerIcon } from '../../../components/power';
 import colorMXID from '../../../../util/colorMXID';
 import { mDirectAtom } from '../../../state/mDirectList';
+import { partialMatrixIdToPhoneNumber } from '../../../../util/functionsUtil';
 
 type RoomNotificationsGroup = {
   roomId: string;
@@ -411,7 +412,7 @@ function RoomNotificationsGroupComp({
             />
           </Avatar>
           <Text size="H4" truncate>
-            {room.name}
+            {partialMatrixIdToPhoneNumber(room.name)}
           </Text>
         </Box>
         <Box shrink="No">

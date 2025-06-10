@@ -15,6 +15,7 @@ import { nameInitials } from '../../utils/common';
 import { useRoomAvatar, useRoomName, useRoomTopic } from '../../hooks/useRoomMeta';
 import { mDirectAtom } from '../../state/mDirectList';
 import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
+import { partialMatrixIdToPhoneNumber } from '../../../util/functionsUtil';
 
 export type RoomIntroProps = {
   room: Room;
@@ -58,7 +59,7 @@ export const RoomIntro = as<'div', RoomIntroProps>(({ room, ...props }, ref) => 
       <Box direction="Column" gap="300">
         <Box direction="Column" gap="100">
           <Text size="H3" priority="500">
-            {name}
+            {partialMatrixIdToPhoneNumber(name)}
           </Text>
           <Text size="T400" priority="400">
             {typeof topic === 'string' ? topic : 'This is the beginning of conversation.'}
