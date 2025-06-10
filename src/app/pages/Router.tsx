@@ -30,6 +30,7 @@ import {
 import { isAuthenticated } from '../../client/state/auth';
 import {
   getAppPathFromHref,
+  getDirectPath,
   getExploreFeaturedPath,
   getHomePath,
   getInboxNotificationsPath,
@@ -69,7 +70,7 @@ export const createRouter = (clientConfig: ClientConfig, screenSize: ScreenSize)
       <Route
         index
         loader={() => {
-          if (isAuthenticated()) return redirect(getHomePath());
+          if (isAuthenticated()) return redirect(getDirectPath());
           const afterLoginPath = getAppPathFromHref(getOriginBaseUrl(), window.location.href);
           if (afterLoginPath) setAfterLoginRedirectPath(afterLoginPath);
           return redirect(getLoginPath());
