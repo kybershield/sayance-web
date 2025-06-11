@@ -9,7 +9,7 @@
     "elementCallEnabled": true
   },
   "hashRouter": {
-    "enabled": false,
+    "enabled": true,
     "basename": "/"
   },
   "branding": {
