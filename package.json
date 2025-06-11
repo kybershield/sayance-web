@@ -1,7 +1,7 @@
 {
-  "name": "cinny",
+  "name": "Sayance",
   "version": "4.6.0",
-  "description": "Yet another matrix client",
+  "description": "A secure end-to-end encrypted chat app",
   "main": "index.js",
   "type": "module",
   "engines": {
