@@ -47,7 +47,10 @@ import { ModalWide } from '../../../styles/Modal.css';
 import { createUploadAtom, UploadSuccess } from '../../../state/upload';
 import { CompactUploadCardRenderer } from '../../../components/upload-card';
 import { useCapabilities } from '../../../hooks/useCapabilities';
-import { matrixIdToPhoneNumber } from '../../../../util/functionsUtil';
+import {
+  matrixIdToPhoneNumber,
+  partialMatrixIdToPhoneNumber,
+} from '../../../../util/functionsUtil';
 
 function MatrixId() {
   const mx = useMatrixClient();
@@ -238,15 +241,13 @@ function ProfileAvatar({ profile, userId }: ProfileProps) {
 }
 
 function ProfileDisplayName({ profile, userId }: ProfileProps) {
-  console.log({ userId });
-  const formattedUserId = matrixIdToPhoneNumber(userId);
   const mx = useMatrixClient();
   const capabilities = useCapabilities();
   const disableSetDisplayname = capabilities['m.set_displayname']?.enabled === false;
 
   const defaultDisplayName =
     profile.displayName && profile.displayName !== userId
-      ? profile.displayName
+      ? partialMatrixIdToPhoneNumber(profile.displayName)
       : matrixIdToPhoneNumber(userId);
   const [displayName, setDisplayName] = useState<string>(defaultDisplayName);
 
@@ -279,12 +280,6 @@ function ProfileDisplayName({ profile, userId }: ProfileProps) {
 
     changeDisplayName(name);
   };
-  console.log({
-    changeDisplayName,
-    disableSetDisplayname,
-    defaultDisplayName,
-    name: profile.displayName,
-  });
 
   const hasChanges = displayName !== defaultDisplayName;
   return (
