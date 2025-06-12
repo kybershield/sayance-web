@@ -9,6 +9,7 @@ import { useMediaAuthentication } from '../../../hooks/useMediaAuthentication';
 import { Settings } from '../../../features/settings';
 import { useUserProfile } from '../../../hooks/useUserProfile';
 import { Modal500 } from '../../../components/Modal500';
+import { partialMatrixIdToPhoneNumber } from '../../../../util/functionsUtil';
 
 export function SettingsTab() {
   const mx = useMatrixClient();
@@ -28,7 +29,7 @@ export function SettingsTab() {
 
   return (
     <SidebarItem active={settings}>
-      <SidebarItemTooltip tooltip={displayName}>
+      <SidebarItemTooltip tooltip={partialMatrixIdToPhoneNumber(displayName)}>
         {(triggerRef) => (
           <SidebarAvatar as="button" ref={triggerRef} onClick={openSettings}>
             <Avatar size="300">

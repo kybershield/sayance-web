@@ -3,6 +3,7 @@ import { Box, Button, IconButton, Icon, Icons, Text } from 'folds';
 import { Room } from 'matrix-js-sdk';
 import { RoomAvatar } from '../room-avatar';
 import { useMatrixClient } from '../../hooks/useMatrixClient';
+import { partialMatrixIdToPhoneNumber } from '../../../util/functionsUtil';
 
 interface IncomingCallToastProps {
   room: Room;
@@ -111,7 +112,7 @@ export function IncomingCallToast({ room, type, onAnswer, onReject }: IncomingCa
       <Box grow="Yes" direction="Column" gap="100">
         {/* Caller Name */}
         <Text size="T400" style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>
-          {room.name || 'Unknown'}
+          {partialMatrixIdToPhoneNumber(room.name) || 'Unknown'}
         </Text>
 
         {/* Call Type with Icon */}
