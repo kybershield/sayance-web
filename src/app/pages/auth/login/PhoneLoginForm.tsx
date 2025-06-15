@@ -7,6 +7,7 @@ import { AsyncStatus, useAsyncCallback } from '../../../hooks/useAsyncCallback';
 import { CustomLoginResponse, useLoginComplete } from './loginUtil';
 import { FieldError } from '../FiledError';
 import { BASE_URL } from '../../../../util/constants';
+import { formatPhoneNumberForBackend } from '../../../../util/functionsUtil';
 
 type RequestTokenResponse = {
   sid: string;
@@ -116,13 +117,16 @@ export function PhoneLoginForm() {
     [string, CountryCode, string, number]
   >(
     useCallback(async (phoneNum, countryCode, secret, attempt) => {
+      // Format the phone number to international format
+      const formattedPhoneNumber = formatPhoneNumberForBackend(phoneNum, countryCode);
+
       const response = await fetch(`${BASE_URL}/_matrix/client/v3/register/phone/requestToken`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          phone_number: phoneNum,
+          phone_number: formattedPhoneNumber,
           country: countryCode,
           client_secret: secret,
           send_attempt: attempt,
