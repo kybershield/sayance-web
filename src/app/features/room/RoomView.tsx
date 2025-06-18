@@ -23,6 +23,8 @@ import { settingsAtom } from '../../state/settings';
 import { useSetting } from '../../state/hooks/settings';
 import { useAccessibleTagColors, usePowerLevelTags } from '../../hooks/usePowerLevelTags';
 import { useTheme } from '../../hooks/useTheme';
+import { RoomCallView } from '../../components/call';
+import { useCallView } from '../../hooks/useCallView';
 
 const FN_KEYS_REGEX = /^F\d+$/;
 const shouldFocusMessageField = (evt: KeyboardEvent): boolean => {
@@ -62,6 +64,19 @@ export function RoomView({ room, eventId }: { room: Room; eventId?: string }) {
   const roomViewRef = useRef<HTMLDivElement>(null);
 
   const [hideActivity] = useSetting(settingsAtom, 'hideActivity');
+  const { shouldShowCallView, widget } = useCallView(room);
+
+  // Debug logging for widget
+  React.useEffect(() => {
+    if (shouldShowCallView && widget) {
+      console.log('🔍 RoomView Debug - Call Widget Active:', {
+        roomId: room.roomId,
+        widgetId: widget.id,
+        widgetUrl: widget.url,
+        shouldShowCallView,
+      });
+    }
+  }, [room.roomId, shouldShowCallView, widget]);
 
   const { roomId } = room;
   const editor = useEditor();
@@ -102,6 +117,14 @@ export function RoomView({ room, eventId }: { room: Room; eventId?: string }) {
   return (
     <Page ref={roomViewRef}>
       <RoomViewHeader />
+
+      {/* Show Element Call when active */}
+      {shouldShowCallView && (
+        <Box shrink="No" style={{ height: '500px', margin: config.space.S200 }}>
+          <RoomCallView room={room} />
+        </Box>
+      )}
+
       <Box grow="Yes" direction="Column">
         <RoomTimeline
           key={roomId}

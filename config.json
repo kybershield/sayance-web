@@ -18,11 +18,11 @@
     "favicon": "/favicon.ico"
   },
   "elementCall": {
-    "url": "https://call.element.io",
+    "url": "https://call.sayance.localhost",
     "participantLimit": 8,
     "brand": "Sayance Call"
   },
-  "allowedWidgets": ["https://call.element.io", "https://app.sayance.localhost"],
+  "allowedWidgets": ["https://call.sayance.localhost", "https://app.sayance.localhost", "http://localhost:8080"],
   "experimentalFeatures": {
     "msc4143": true,
     "msc4140": true,

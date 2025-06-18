@@ -5,6 +5,19 @@ export type HashRouterConfig = {
   basename?: string;
 };
 
+export type ElementCallConfig = {
+  url?: string;
+  participantLimit?: number;
+  brand?: string;
+};
+
+export type FeatureFlags = {
+  spacesEnabled?: boolean;
+  voipEnabled?: boolean;
+  threadsEnabled?: boolean;
+  elementCallEnabled?: boolean;
+};
+
 export type ClientConfig = {
   defaultHomeserver?: number;
   homeserverList?: string[];
@@ -16,6 +29,10 @@ export type ClientConfig = {
     rooms?: string[];
     servers?: string[];
   };
+
+  featuresEnabled?: FeatureFlags;
+  elementCall?: ElementCallConfig;
+  allowedWidgets?: string[];
 
   hashRouter?: HashRouterConfig;
 };
