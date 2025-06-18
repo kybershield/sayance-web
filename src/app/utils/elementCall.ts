@@ -31,6 +31,7 @@ export function generateElementCallWidgetUrl(
   options: {
     skipLobby?: boolean;
     returnToLobby?: boolean;
+    action?: 'join' | 'start';
   } = {},
   widgetId: string
 ): string {
@@ -52,7 +53,6 @@ export function generateElementCallWidgetUrl(
   // Build parameters for Element Call (using template variables like element-web)
   const params = new URLSearchParams({
     embed: 'true', // We're embedding EC within another application
-    skipLobby: options.skipLobby ? 'true' : 'false', // Skip the lobby in case we show a lobby component of our own
     returnToLobby: options.returnToLobby ? 'true' : 'false', // Returns to the lobby when the call ends
     hideHeader: 'true', // Hide the header since our room header is enough
     userId: client.getUserId()!,
@@ -64,6 +64,7 @@ export function generateElementCallWidgetUrl(
     theme: 'light', // TODO: Get from app theme
     widgetId: widgetId,
     parentUrl: window.location.href,
+    intent: options?.action === 'join' ? 'join_existing' : 'start_call',
   });
 
   // Add room encryption info
@@ -90,6 +91,7 @@ export function createElementCallWidgetData(
   options: {
     skipLobby?: boolean;
     returnToLobby?: boolean;
+    action?: 'join' | 'start';
   } = {}
 ): WidgetData {
   const room = client.getRoom(roomId);
@@ -98,6 +100,7 @@ export function createElementCallWidgetData(
     skipLobby: options.skipLobby ?? false,
     returnToLobby: options.returnToLobby ?? false,
     perParticipantE2EE: room?.hasEncryptionStateEvent() ?? false,
+    action: options.action ?? 'start',
   };
 }
 
@@ -173,6 +176,7 @@ export function createElementCallWidget(
   options: {
     skipLobby?: boolean;
     returnToLobby?: boolean;
+    action?: 'join' | 'start';
   } = {}
 ): Widget {
   const widgetId = generateWidgetId();

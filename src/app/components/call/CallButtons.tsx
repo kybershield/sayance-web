@@ -12,35 +12,53 @@ interface CallButtonsProps {
 }
 
 export function CallButtons({ room, onElementCallStart }: CallButtonsProps) {
-  const { canStartCall, disabledReason, availableCallTypes, startCall, isElementCallEnabled } =
-    useElementCall(room);
+  const {
+    canStartCall,
+    canJoinCall,
+    disabledReason,
+    startCall,
+    joinCall,
+    action,
+    participantCount,
+    isElementCallEnabled,
+  } = useElementCall(room);
 
   const handleVoiceCall = () => {
-    if (!canStartCall) return;
-
-    // Use Element Call if available, fallback to other types
-    const callType = availableCallTypes.includes(PlatformCallType.ElementCall)
-      ? PlatformCallType.ElementCall
-      : availableCallTypes[0];
-
-    if (callType) {
-      startCall(CallType.Voice, callType);
+    if (action === 'join' && canJoinCall) {
+      joinCall(CallType.Voice, PlatformCallType.ElementCall);
+      onElementCallStart?.(room.roomId);
+    } else if (action === 'start' && canStartCall) {
+      startCall(CallType.Voice, PlatformCallType.ElementCall);
       onElementCallStart?.(room.roomId);
     }
   };
 
   const handleVideoCall = () => {
-    if (!canStartCall) return;
-
-    // Use Element Call if available, fallback to other types
-    const callType = availableCallTypes.includes(PlatformCallType.ElementCall)
-      ? PlatformCallType.ElementCall
-      : availableCallTypes[0];
-
-    if (callType) {
-      startCall(CallType.Video, callType);
+    if (action === 'join' && canJoinCall) {
+      joinCall(CallType.Video, PlatformCallType.ElementCall);
+      onElementCallStart?.(room.roomId);
+    } else if (action === 'start' && canStartCall) {
+      startCall(CallType.Video, PlatformCallType.ElementCall);
       onElementCallStart?.(room.roomId);
     }
+  };
+
+  const isCallEnabled = (action === 'start' && canStartCall) || (action === 'join' && canJoinCall);
+
+  const getButtonLabel = (baseLabel: string) => {
+    if (action === 'join') {
+      return `Join ${baseLabel.toLowerCase()}`;
+    }
+    return `Start ${baseLabel.toLowerCase()}`;
+  };
+
+  const getTooltipText = (baseText: string) => {
+    if (action === 'join') {
+      const participantText =
+        participantCount === 1 ? '1 participant' : `${participantCount} participants`;
+      return `Join ongoing call (${participantText})`;
+    }
+    return disabledReason || baseText;
   };
 
   const renderCallButton = (
@@ -49,14 +67,17 @@ export function CallButtons({ room, onElementCallStart }: CallButtonsProps) {
     label: string,
     onClick: () => void,
     showBeta: boolean = false,
-    tooltipText: string
+    baseTooltipText: string
   ) => {
+    const buttonLabel = getButtonLabel(label);
+    const tooltipText = getTooltipText(baseTooltipText);
+
     const button = (
       <IconButton
-        aria-label={label}
+        aria-label={buttonLabel}
         style={{ borderRadius: '100%', width: toRem(35), height: toRem(35) }}
         onClick={onClick}
-        disabled={!canStartCall}
+        disabled={!isCallEnabled}
       >
         <img
           src={icon}
@@ -64,7 +85,7 @@ export function CallButtons({ room, onElementCallStart }: CallButtonsProps) {
           style={{
             width: toRem(20),
             height: toRem(20),
-            opacity: canStartCall ? 1 : 0.5,
+            opacity: isCallEnabled ? 1 : 0.5,
           }}
         />
       </IconButton>
@@ -114,19 +135,19 @@ export function CallButtons({ room, onElementCallStart }: CallButtonsProps) {
       {renderCallButton(
         VoiceCallIcon,
         'Voice Call',
-        'Start voice call',
+        'voice call',
         handleVoiceCall,
-        availableCallTypes.includes(PlatformCallType.ElementCall),
-        disabledReason || 'Start voice call'
+        true,
+        'Start voice call'
       )}
 
       {renderCallButton(
         VideoCallIcon,
         'Video Call',
-        'Start video call',
+        'video call',
         handleVideoCall,
-        availableCallTypes.includes(PlatformCallType.ElementCall),
-        disabledReason || 'Start video call'
+        true,
+        'Start video call'
       )}
     </>
   );

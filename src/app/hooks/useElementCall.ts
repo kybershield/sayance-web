@@ -5,6 +5,7 @@ import { useMatrixClient } from './useMatrixClient';
 import { PlatformCallType, CallType, CallPlatformTypeProps } from '../types/call';
 import { sendCallNotification, isWidgetUrlAllowed, createElementCallWidget } from '../utils/elementCall';
 import { startEmbeddedCall, useCallState } from './useCallState';
+import { useCallAction } from './useMatrixRTCCall';
 
 export const getPlatformCallTypeProps = (
   platformCallType: PlatformCallType
@@ -31,9 +32,13 @@ export const getPlatformCallTypeProps = (
 
 export interface UseElementCallResult {
   canStartCall: boolean;
+  canJoinCall: boolean;
   disabledReason: string | null;
   availableCallTypes: PlatformCallType[];
   startCall: (callType: CallType, platformType: PlatformCallType) => void;
+  joinCall: (callType: CallType, platformType: PlatformCallType) => void;
+  action: 'start' | 'join' | 'disabled';
+  participantCount: number;
   isElementCallEnabled: boolean;
   callState: any; // Current call state for this room
 }
@@ -42,6 +47,7 @@ export function useElementCall(room: Room): UseElementCallResult {
   const mx = useMatrixClient();
   const clientConfig = useClientConfig();
   const callState = useCallState(room);
+  const callAction = useCallAction(room);
 
   // Check if Element Call is enabled in configuration
   const isElementCallEnabled = useMemo(() => {
@@ -59,15 +65,14 @@ export function useElementCall(room: Room): UseElementCallResult {
     return isWidgetUrlAllowed(elementCallConfig.url, clientConfig.allowedWidgets);
   }, [elementCallConfig?.url, clientConfig.allowedWidgets]);
 
-  // Check permissions - simplified for now
-  const canStartCall = useMemo(() => {
-    if (!room || !mx) return false;
-    if (!isElementCallEnabled) return false;
-    if (!elementCallConfig?.url) return false;
-    if (!isUrlAllowed) return false;
-    
-    // Don't allow starting a new call if there's already an active call
-    if (callState?.isActive) return false;
+  // Check basic prerequisites
+  const hasBasicRequirements = useMemo(() => {
+    return !!(room && mx && isElementCallEnabled && elementCallConfig?.url && isUrlAllowed);
+  }, [room, mx, isElementCallEnabled, elementCallConfig, isUrlAllowed]);
+
+  // Check permissions
+  const hasPermissions = useMemo(() => {
+    if (!hasBasicRequirements) return false;
     
     // Check if user has permission to start calls
     const powerLevels = room.currentState.getStateEvents('m.room.power_levels', '');
@@ -78,7 +83,16 @@ export function useElementCall(room: Room): UseElementCallResult {
     const requiredLevel = content.events?.['im.vector.modular.widgets'] ?? content.state_default ?? 50;
     
     return userLevel >= requiredLevel;
-  }, [room, mx, isElementCallEnabled, elementCallConfig, isUrlAllowed, callState]);
+  }, [hasBasicRequirements, room, mx]);
+
+  // Determine if can start or join based on call action
+  const canStartCall = useMemo(() => {
+    return hasBasicRequirements && hasPermissions && callAction.action === 'start';
+  }, [hasBasicRequirements, hasPermissions, callAction.action]);
+
+  const canJoinCall = useMemo(() => {
+    return hasBasicRequirements && hasPermissions && callAction.action === 'join';
+  }, [hasBasicRequirements, hasPermissions, callAction.action]);
 
   // Determine available call types
   const availableCallTypes = useMemo((): PlatformCallType[] => {
@@ -95,6 +109,9 @@ export function useElementCall(room: Room): UseElementCallResult {
 
   // Determine disabled reason
   const disabledReason = useMemo((): string | null => {
+    if (callAction.reason) {
+      return callAction.reason;
+    }
     if (!isElementCallEnabled) {
       return 'Element Call is not enabled';
     }
@@ -104,26 +121,25 @@ export function useElementCall(room: Room): UseElementCallResult {
     if (!isUrlAllowed) {
       return 'Element Call URL not allowed';
     }
-    if (callState?.isActive) {
-      return 'Call already in progress';
-    }
-    if (!canStartCall) {
+    if (!hasPermissions) {
       return 'You do not have permission to start calls';
     }
     if (!room) {
       return 'Room not available';
     }
     
-    // Check if there are any members in the room
-    const memberCount = room.getJoinedMemberCount();
-    if (memberCount <= 1) {
-      return 'No one else is in this room';
+    // Check if there are any members in the room for starting new calls
+    if (callAction.action === 'start') {
+      const memberCount = room.getJoinedMemberCount();
+      if (memberCount <= 1) {
+        return 'No one else is in this room';
+      }
     }
     
     return null;
-  }, [isElementCallEnabled, elementCallConfig, isUrlAllowed, callState, canStartCall, room]);
+  }, [callAction, isElementCallEnabled, elementCallConfig, isUrlAllowed, hasPermissions, room]);
 
-  // Start call function
+  // Start call function (creates a new call)
   const startCall = useCallback(async (callType: CallType, platformType: PlatformCallType) => {
     if (!canStartCall || !room || !elementCallConfig) return;
     
@@ -133,9 +149,10 @@ export function useElementCall(room: Room): UseElementCallResult {
         const widget = createElementCallWidget(mx, room.roomId, elementCallConfig, {
           skipLobby: false, // TODO: Make configurable
           returnToLobby: false,
+          action: 'start',
         });
         
-        console.log('Created Element Call widget:', widget);
+        console.log('Created Element Call widget for new call:', widget);
         
         // Send call notification to room members
         // await sendCallNotification(mx, room.roomId, callType);
@@ -151,11 +168,47 @@ export function useElementCall(room: Room): UseElementCallResult {
     // Handle other platform types here
   }, [canStartCall, room, elementCallConfig, mx]);
 
+  // Join call function (joins existing call)
+  const joinCall = useCallback(async (callType: CallType, platformType: PlatformCallType) => {
+    if (!canJoinCall || !room || !elementCallConfig) return;
+    
+    if (platformType === PlatformCallType.ElementCall) {
+      try {
+        // For joining, reuse existing widget or create one that connects to existing session
+        let widget = callAction.callState.widget;
+        
+        if (!widget) {
+          // Create widget that will join the existing session
+          widget = createElementCallWidget(mx, room.roomId, elementCallConfig, {
+            skipLobby: false, // Show lobby to let user configure devices before joining
+            returnToLobby: false,
+            action: 'join',
+          });
+          console.log('Created Element Call widget for joining existing call:', widget);
+        } else {
+          console.log('Reusing existing Element Call widget for joining:', widget);
+        }
+        
+        // Start embedded call tracking with widget (joining existing session)
+        startEmbeddedCall(room.roomId, callType, widget);
+        
+        console.log('Joining existing Element Call in room:', room.roomId, 'with', callAction.callState.participantCount, 'participants');
+      } catch (error) {
+        console.error('Failed to join Element Call:', error);
+      }
+    }
+    // Handle other platform types here
+  }, [canJoinCall, room, elementCallConfig, mx, callAction.callState]);
+
   return {
     canStartCall: canStartCall && !disabledReason,
+    canJoinCall: canJoinCall && !disabledReason,
     disabledReason,
     availableCallTypes,
     startCall,
+    joinCall,
+    action: callAction.action,
+    participantCount: callAction.callState.participantCount,
     isElementCallEnabled,
     callState,
   };

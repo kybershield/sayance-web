@@ -65,7 +65,7 @@ export function CallNotificationToastManager() {
           return true;
         }
       } catch (error) {
-        console.log('CallNotificationToastManager: Error checking encrypted event:', error);
+        console.error('CallNotificationToastManager: Error checking encrypted event:', error);
       }
     }
 
@@ -75,30 +75,20 @@ export function CallNotificationToastManager() {
   // Helper function to handle call notification logic
   const handleCallNotification = useCallback(
     (event: MatrixEvent) => {
-      console.log('CallNotificationToastManager: Found call notification event:', {
-        type: event.getType(),
-        content: event.getContent(),
-      });
-
       const eventAge = Date.now() - event.getTs();
       const sender = event.getSender();
       const currentUserId = mx.getUserId();
-      console.log('Sender', sender);
-      console.log('Current User ID', currentUserId);
 
       // Don't show notification for our own calls
       if (sender === currentUserId) {
-        console.log('CallNotificationToastManager: Ignoring own call notification');
         return;
       }
 
       // Don't show notifications for old events (older than 1 minute)
       if (eventAge > 60000) {
-        console.log('CallNotificationToastManager: Ignoring old call notification:', eventAge);
         return;
       }
 
-      console.log('CallNotificationToastManager: Adding call notification toast');
       addToast(event);
     },
     [mx, addToast]
@@ -112,17 +102,8 @@ export function CallNotificationToastManager() {
       removed: boolean,
       data: any
     ) => {
-      console.log('CallNotificationToastManager: Timeline event received:', {
-        type: event.getType(),
-        content: event.getContent(),
-        sender: event.getSender(),
-        roomId: event.getRoomId(),
-        isLiveEvent: data.liveEvent,
-      });
-
       // Only handle live events (not historical)
       if (!data.liveEvent) {
-        console.log('CallNotificationToastManager: Ignoring historical event');
         return;
       }
 
@@ -132,9 +113,6 @@ export function CallNotificationToastManager() {
       } else if (event.getType() === 'm.room.encrypted') {
         // For encrypted events, also listen for the decrypted event
         const handleDecrypted = () => {
-          console.log(
-            'CallNotificationToastManager: Event decrypted, checking if it is a call notification'
-          );
           if (isCallNotifyEvent(event)) {
             handleCallNotification(event);
           }
@@ -144,11 +122,9 @@ export function CallNotificationToastManager() {
       }
     };
 
-    console.log('CallNotificationToastManager: Setting up timeline event listener');
     mx.on(RoomEvent.Timeline, handleTimelineEvent);
 
     return () => {
-      console.log('CallNotificationToastManager: Removing timeline event listener');
       mx.removeListener(RoomEvent.Timeline, handleTimelineEvent);
     };
   }, [mx, selectedRoomId, isCallNotifyEvent, handleCallNotification]);

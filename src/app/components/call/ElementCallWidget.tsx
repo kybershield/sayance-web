@@ -33,12 +33,11 @@ export function ElementCallWidget({
 
   // Get the widget from call state
   const widget = getCallWidget(room.roomId);
+  console.log({ widget });
 
   // Prepare step - like element-web's prepare()
   useEffect(() => {
     if (!widget) return;
-
-    console.log('[ElementCallWidget] Preparing widget...');
 
     // Create driver
     const driver = new SayanceWidgetDriver(matrixClient, room.roomId, callType);
@@ -46,24 +45,15 @@ export function ElementCallWidget({
 
     // Mark as prepared
     setIsPreparing(false);
-    console.log('[ElementCallWidget] Widget prepared');
   }, [widget, matrixClient, room.roomId, callType]);
 
   // Start messaging when iframe ref is set - following element-web pattern
   const startMessaging = useCallback(() => {
     if (!widget || !iframeRef.current || !driverRef.current || isPreparing) {
-      console.log('[ElementCallWidget] Not ready to start messaging:', {
-        hasWidget: !!widget,
-        hasIframe: !!iframeRef.current,
-        hasDriver: !!driverRef.current,
-        isPreparing,
-      });
       return;
     }
 
     try {
-      console.log('[ElementCallWidget] Starting Widget API messaging...');
-
       // Create matrix-widget-api Widget instance
       const matrixWidget = new Widget({
         id: widget.id,
@@ -79,17 +69,13 @@ export function ElementCallWidget({
       widgetApiRef.current = widgetApi;
 
       // Set up event listeners
-      widgetApi.on('preparing', () => {
-        console.log('[ElementCallWidget] Widget API preparing...');
-      });
+      widgetApi.on('preparing', () => {});
 
       widgetApi.on('ready', () => {
-        console.log('[ElementCallWidget] Widget API ready!');
         setIsLoading(false);
       });
 
       widgetApi.on('content_loaded', () => {
-        console.log('[ElementCallWidget] Widget content loaded');
         setIsLoading(false);
       });
 
@@ -101,20 +87,14 @@ export function ElementCallWidget({
       // Add Element Call specific action handlers
 
       widgetApi.on('action:org.matrix.msc4157.update_delayed_event', (ev: any) => {
-        console.log('[ElementCallWidget] Update delayed event:', ev.detail.data);
         widgetApi.transport.reply(ev.detail, {});
       });
 
       // Handle io.element.join - Element Call trying to join the call
       widgetApi.on('action:io.element.join', async (ev: any) => {
         ev.preventDefault();
-        console.log('[ElementCallWidget] Element Call join request:', ev.detail.data);
-        console.log('Sending call notification', {
-          roomId: room.roomId,
-          callType,
-        });
 
-        if (widget.creatorUserId === myUserId) {
+        if (widget.data?.action === 'start') {
           await sendCallNotification(matrixClient, room.roomId, callType);
         }
 
@@ -123,13 +103,11 @@ export function ElementCallWidget({
 
         // You could emit a custom event here to notify sayance-web that user joined
         // For now, just log success
-        console.log('[ElementCallWidget] Call join acknowledged');
       });
 
       // Handle io.element.device_mute - Element Call sending/requesting device mute state
       widgetApi.on('action:io.element.device_mute', (ev: any) => {
         ev.preventDefault();
-        console.log('[ElementCallWidget] Device mute request:', ev.detail.data);
 
         // Element Call expects audio_enabled/video_enabled response
         // For now, return current states (could be enhanced to track actual mute states)
@@ -146,19 +124,16 @@ export function ElementCallWidget({
           response.video_enabled = ev.detail.data.video_enabled;
         }
 
-        console.log('[ElementCallWidget] Device mute response:', response);
         widgetApi.transport.reply(ev.detail, response);
       });
 
       // Handle set_always_on_screen - Element Call trying to keep widget active
       widgetApi.on('action:set_always_on_screen', (ev: any) => {
         ev.preventDefault();
-        console.log('[ElementCallWidget] Set always on screen request:', ev.detail.data);
 
         // For sayance-web, we can just acknowledge this - the widget will stay active
         // In element-web this manages widget persistence via ActiveWidgetStore
         const { value } = ev.detail.data || {};
-        console.log(`[ElementCallWidget] Setting always on screen: ${value}`);
 
         // Acknowledge the request
         widgetApi.transport.reply(ev.detail, {});
@@ -167,7 +142,6 @@ export function ElementCallWidget({
       // Handle io.element.spotlight_layout - Element Call trying to change layout
       widgetApi.on('action:io.element.spotlight_layout', (ev: any) => {
         ev.preventDefault();
-        console.log('[ElementCallWidget] Spotlight layout request:', ev.detail.data);
 
         // For sayance-web, we can just acknowledge this
         // In element-web this would switch to spotlight view in the call UI
@@ -179,7 +153,6 @@ export function ElementCallWidget({
       // Handle io.element.tile_layout - Element Call trying to change layout
       widgetApi.on('action:io.element.tile_layout', (ev: any) => {
         ev.preventDefault();
-        console.log('[ElementCallWidget] Tile layout request:', ev.detail.data);
 
         // Acknowledge the request
         widgetApi.transport.reply(ev.detail, {});
@@ -188,7 +161,6 @@ export function ElementCallWidget({
       // Handle hangup call - Element Call notifying about call end
       widgetApi.on('action:im.vector.hangup', (ev: any) => {
         ev.preventDefault();
-        console.log('[ElementCallWidget] Call hangup:', ev.detail.data);
 
         // Acknowledge and potentially trigger onClose
         widgetApi.transport.reply(ev.detail, {});
@@ -197,27 +169,19 @@ export function ElementCallWidget({
           console.error('[ElementCallWidget] Call ended with error:', ev.detail.data.errorMessage);
           onError?.(new Error(`Call ended: ${ev.detail.data.errorMessage}`));
         } else {
-          console.log('[ElementCallWidget] Call ended normally');
           onClose?.();
         }
       });
 
-      console.log('[ElementCallWidget] Widget API messaging started');
-
-      // Add debugging to verify our handlers are working
-      console.log('[ElementCallWidget] Registering action handlers...');
-
       // Add a catch-all handler to see what actions we're receiving
       const originalOn = widgetApi.on.bind(widgetApi);
       widgetApi.on = function (event: string, handler: (...args: any[]) => void) {
-        console.log('[ElementCallWidget] Registering handler for:', event);
         return originalOn(event, handler);
       };
 
       // Also log all incoming messages
       window.addEventListener('message', (event) => {
         if (event.data && event.data.api === 'fromWidget') {
-          console.log('[ElementCallWidget] Received fromWidget message:', event.data);
         }
       });
     } catch (error) {
@@ -229,8 +193,6 @@ export function ElementCallWidget({
   // Iframe ref callback - following element-web pattern
   const iframeRefCallback = useCallback(
     (ref: HTMLIFrameElement | null) => {
-      console.log('[ElementCallWidget] Iframe ref callback:', { ref: !!ref, isPreparing });
-
       iframeRef.current = ref;
 
       if (ref && !isPreparing) {
@@ -239,7 +201,6 @@ export function ElementCallWidget({
       } else if (!ref) {
         // Cleanup when iframe is removed
         if (widgetApiRef.current) {
-          console.log('[ElementCallWidget] Cleaning up Widget API');
           widgetApiRef.current.stop();
           widgetApiRef.current = null;
         }
@@ -259,7 +220,6 @@ export function ElementCallWidget({
   useEffect(() => {
     return () => {
       if (widgetApiRef.current) {
-        console.log('[ElementCallWidget] Cleaning up Widget API on unmount');
         widgetApiRef.current.stop();
         widgetApiRef.current = null;
       }
@@ -283,8 +243,6 @@ export function ElementCallWidget({
       </div>
     );
   }
-
-  console.log('Using Element Call widget:', widget);
 
   return (
     <div className={styles.elementCallWidget}>

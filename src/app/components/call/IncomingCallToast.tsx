@@ -31,6 +31,8 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
   // Get call details from the event
   const callType = notifyEvent.getContent()?.call_type || 'voice';
   const senderId = notifyEvent.getSender();
+  console.log({ elementCallHook, notifyEvent, callType, senderId });
+
   const senderName =
     room && senderId
       ? getMemberDisplayName(room, senderId) ?? getMxIdLocalPart(senderId) ?? senderId
@@ -42,22 +44,22 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
     return null;
   }
 
-  // Start playing ring sound
-  useEffect(() => {
-    if (notificationSound && audioManager.getHasUserGesture()) {
-      audioManager.playSound(RingSound, { loop: true, volume: 0.8 }).then((audio) => {
-        audioRef.current = audio;
-      });
-    } else if (notificationSound) {
-      console.warn('Ring sound blocked - waiting for user interaction');
-    }
+  // Start playing ring sound : TODO: Add back in
+  // useEffect(() => {
+  //   if (notificationSound && audioManager.getHasUserGesture()) {
+  //     audioManager.playSound(RingSound, { loop: true, volume: 0.8 }).then((audio) => {
+  //       audioRef.current = audio;
+  //     });
+  //   } else if (notificationSound) {
+  //     console.warn('Ring sound blocked - waiting for user interaction');
+  //   }
 
-    return () => {
-      if (audioRef.current) {
-        audioManager.stopSound(audioRef.current);
-      }
-    };
-  }, [notificationSound]);
+  //   return () => {
+  //     if (audioRef.current) {
+  //       audioManager.stopSound(audioRef.current);
+  //     }
+  //   };
+  // }, [notificationSound]);
 
   // Auto-dismiss after MAX_RING_TIME_MS
   useEffect(() => {
@@ -78,10 +80,29 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
       audioManager.stopSound(audioRef.current);
     }
 
-    // Start Element Call
+    // Join or start Element Call based on current state
     try {
       const callTypeEnum = callType === 'voice' ? CallType.Voice : CallType.Video;
-      elementCallHook.startCall(callTypeEnum, PlatformCallType.ElementCall);
+
+      if (elementCallHook.action === 'join' && elementCallHook.canJoinCall) {
+        console.log(
+          'Joining existing Element Call with',
+          elementCallHook.participantCount,
+          'participants'
+        );
+        elementCallHook.joinCall(callTypeEnum, PlatformCallType.ElementCall);
+      } else if (elementCallHook.action === 'start' && elementCallHook.canStartCall) {
+        console.log('Starting new Element Call');
+        elementCallHook.startCall(callTypeEnum, PlatformCallType.ElementCall);
+      } else {
+        console.warn('Cannot join or start call:', {
+          action: elementCallHook.action,
+          canJoin: elementCallHook.canJoinCall,
+          canStart: elementCallHook.canStartCall,
+          reason: elementCallHook.disabledReason,
+        });
+      }
+
       onDismiss();
     } catch (error) {
       console.error('Failed to join call:', error);
@@ -97,6 +118,11 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
   }, [onDismiss]);
 
   const isVideoCall = callType === 'video';
+  const isJoining = elementCallHook.action === 'join';
+  const joinButtonText = isJoining ? 'Join' : 'Answer';
+  const headerText = isJoining
+    ? `Ongoing ${isVideoCall ? 'Video' : 'Voice'} Call`
+    : `Incoming ${isVideoCall ? 'Video' : 'Voice'} Call`;
 
   return (
     <div className={styles.incomingCallToast}>
@@ -104,7 +130,7 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
         <Box gap="300" alignItems="Center">
           <Icon size="400" src={isVideoCall ? Icons.Play : Icons.Phone} />
           <Text size="T300" priority="400">
-            Incoming {isVideoCall ? 'Video' : 'Voice'} Call
+            {headerText}
           </Text>
         </Box>
         <Badge variant="Secondary" size="300">
@@ -118,6 +144,12 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
         </Text>
         <Text size="T200" priority="300" className={styles.roomName}>
           {roomName}
+          {isJoining && elementCallHook.participantCount > 0 && (
+            <span style={{ marginLeft: '0.5rem', color: 'var(--accent-color)' }}>
+              • {elementCallHook.participantCount} participant
+              {elementCallHook.participantCount !== 1 ? 's' : ''}
+            </span>
+          )}
         </Text>
       </div>
 
@@ -138,9 +170,10 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
           radii="300"
           onClick={handleJoin}
           className={styles.joinButton}
+          disabled={!elementCallHook.canJoinCall && !elementCallHook.canStartCall}
         >
           <Icon size="200" src={isVideoCall ? Icons.Play : Icons.Phone} />
-          Join
+          {joinButtonText}
         </Button>
       </div>
     </div>

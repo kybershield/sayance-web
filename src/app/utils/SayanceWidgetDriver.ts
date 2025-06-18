@@ -174,7 +174,6 @@ export class SayanceWidgetDriver extends WidgetDriver {
       }
     }
     
-    console.log('[SayanceWidgetDriver] Final approved capabilities:', Array.from(approved));
     return approved;
   }
 
@@ -373,7 +372,6 @@ export class SayanceWidgetDriver extends WidgetDriver {
 
   public async navigate(uri: string): Promise<void> {
     // In sayance-web, handle navigation - for now just log
-    console.log('[SayanceWidgetDriver] Navigate request:', uri);
   }
 
   public async *getTurnServers(): AsyncGenerator<ITurnServer> {
