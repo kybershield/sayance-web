@@ -37,7 +37,6 @@ import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
 import { useSyncState } from '../../hooks/useSyncState';
 import { stopPropagation } from '../../utils/keyboard';
 import { SyncStatus } from './SyncStatus';
-import { initializeCallSystem } from '../../utils/initializeCallSystem';
 
 function ClientRootLoading() {
   return (
@@ -176,10 +175,6 @@ export function ClientRoot({ children }: ClientRootProps) {
       (state) => {
         if (state === 'PREPARED') {
           setLoading(false);
-          // Initialize call system when sync is ready
-          if (mx) {
-            initializeCallSystem(mx as any);
-          }
         }
       },
       [mx]
