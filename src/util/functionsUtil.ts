@@ -25,7 +25,7 @@ export function phoneNumberToMatrixId(phoneNumber: string): string {
   if (!/^\d+$/.test(number)) {
     throw new Error('Invalid phone number format');
   }
-  return `@${number}_1:sayance.org`;
+  return `@${number}_1:sayance.localhost`;
 }
 
 /**

@@ -50,8 +50,6 @@ import {
   getRoomNotificationMode,
   useRoomsNotificationPreferencesContext,
 } from '../../../hooks/useRoomsNotificationPreferences';
-import { VideoCall } from '../../../components/video-call/VideoCall';
-import { useRoomCall } from '../../../hooks/useRoomCall';
 import SayanceLogo from '../../../../../public/logo.svg';
 import SearchIcon from '../../../../../public/icons/search-icon.svg';
 import MenuIcon from '../../../../../public/icons/menu-icon.svg';
@@ -190,20 +188,10 @@ interface DirectRoomItemProps {
   selected: boolean;
   linkPath: string;
   notificationMode: any;
-  onStartVideoCall: () => void;
-  onStartVoiceCall: () => void;
 }
 
-function DirectRoomItem({
-  room,
-  selected,
-  linkPath,
-  notificationMode,
-  onStartVideoCall,
-  onStartVoiceCall,
-}: DirectRoomItemProps) {
+function DirectRoomItem({ room, selected, linkPath, notificationMode }: DirectRoomItemProps) {
   // const [isHovered, setIsHovered] = useState(false);
-  const callInfo = useRoomCall(room);
 
   return (
     <Box
@@ -219,93 +207,6 @@ function DirectRoomItem({
         linkPath={linkPath}
         notificationMode={notificationMode}
       />
-
-      {/* Call Status Indicator */}
-      {callInfo.isCallActive && (
-        <Box
-          style={{
-            position: 'absolute',
-            right: '8px',
-            top: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            // background: 'var(--accent-brand)',
-            color: 'white',
-            padding: '2px 6px',
-            borderRadius: '8px',
-            fontSize: '10px',
-            fontWeight: '500',
-          }}
-        >
-          <Icon src={Icons.Play} size="50" />
-          <Text as="span" size="T200" style={{ color: 'white' }}>
-            {callInfo.participantCount}
-          </Text>
-          {callInfo.canJoinCall && (
-            <IconButton
-              size="300"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onStartVideoCall();
-              }}
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                minWidth: 'auto',
-                padding: '2px',
-              }}
-              aria-label="Join call"
-            >
-              <Icon src={Icons.ArrowGoRight} size="50" />
-            </IconButton>
-          )}
-        </Box>
-      )}
-
-      {/* Hover Call Buttons (only show if no active call) */}
-      {/* {isHovered && !callInfo.isCallActive && (
-        <Box
-          style={{
-            position: 'absolute',
-            right: '8px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            display: 'flex',
-            gap: '4px',
-            // background: 'var(--color-background-solid)',
-            padding: '4px',
-            borderRadius: '4px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          }}
-        >
-          <IconButton
-            size="300"
-            variant="Background"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onStartVoiceCall();
-            }}
-            aria-label="Start voice call"
-          >
-            <Icon src={Icons.Phone} size="100" />
-          </IconButton>
-          <IconButton
-            size="300"
-            variant="Background"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onStartVideoCall();
-            }}
-            aria-label="Start video call"
-          >
-            <Icon src={Icons.Play} size="100" />
-          </IconButton>
-        </Box>
-      )} */}
     </Box>
   );
 }
@@ -418,8 +319,6 @@ export function Direct() {
                           notificationPreferences,
                           room.roomId
                         )}
-                        onStartVideoCall={() => handleStartVideoCall(roomId)}
-                        onStartVoiceCall={() => handleStartVoiceCall(roomId)}
                       />
                     </VirtualTile>
                   );
@@ -428,11 +327,6 @@ export function Direct() {
             </NavCategory>
           </Box>
         </PageNavContent>
-      )}
-
-      {/* Video Call Modal */}
-      {activeCall && (
-        <VideoCall roomId={activeCall} isOpen={!!activeCall} onClose={handleCloseCall} />
       )}
     </PageNav>
   );

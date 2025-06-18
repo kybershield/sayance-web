@@ -857,6 +857,11 @@
   resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-1.10.1.tgz#1d76d15290c0212076c15ede94d15157ba0c6344"
   integrity sha512-wJ8ReQbHxsAfXhrf9ixl0aYbZorRuOWpBNzm8pL8ftmSxQx/wnJD5Eg861NwJU/czy2VXFIebCeZnZrI9rktIQ==
 
+"@element-hq/element-call-embedded@0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@element-hq/element-call-embedded/-/element-call-embedded-0.12.0.tgz#654da28610c758c6d1164bbfe61007a636357cca"
+  integrity sha512-p/ZymzOqrF5WDnt7ZIkpdtQwzUcwchykIGcU9quU1YkAwOCnGwqCwGmgG0YAvPEhqWAb4DVJ4qHL0ZZ+WqxAtQ==
+
 "@emotion/hash@^0.9.0":
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.9.2.tgz#ff9221b9f58b4dfe61e619a7788734bd63f6898b"

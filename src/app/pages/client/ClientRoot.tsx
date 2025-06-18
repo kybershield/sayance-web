@@ -37,7 +37,7 @@ import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
 import { useSyncState } from '../../hooks/useSyncState';
 import { stopPropagation } from '../../utils/keyboard';
 import { SyncStatus } from './SyncStatus';
-import { CallManager } from '../../components/call';
+import { initializeCallSystem } from '../../utils/initializeCallSystem';
 
 function ClientRootLoading() {
   return (
@@ -172,11 +172,18 @@ export function ClientRoot({ children }: ClientRootProps) {
 
   useSyncState(
     mx,
-    useCallback((state) => {
-      if (state === 'PREPARED') {
-        setLoading(false);
-      }
-    }, [])
+    useCallback(
+      (state) => {
+        if (state === 'PREPARED') {
+          setLoading(false);
+          // Initialize call system when sync is ready
+          if (mx) {
+            initializeCallSystem(mx as any);
+          }
+        }
+      },
+      [mx]
+    )
   );
 
   return (
@@ -216,7 +223,6 @@ export function ClientRoot({ children }: ClientRootProps) {
                   <Windows />
                   <Dialogs />
                   <ReusableContextMenu />
-                  <CallManager />
                 </MediaConfigProvider>
               </CapabilitiesProvider>
             )}
