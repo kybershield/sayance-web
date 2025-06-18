@@ -26,6 +26,17 @@ import { getMxIdLocalPart, mxcUrlToHttp } from '../../utils/matrix';
 import { useSelectedRoom } from '../../hooks/router/useSelectedRoom';
 import { useInboxNotificationsSelected } from '../../hooks/router/useInbox';
 import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
+import { CallNotificationToastManager } from '../../components/CallNotificationToastManager';
+import { audioManager } from '../../utils/audioManager';
+
+function AudioManagerInitializer() {
+  useEffect(() => {
+    // Initialize audio manager to ensure it's ready
+    console.log('AudioManager initialized. Has user gesture:', audioManager.getHasUserGesture());
+  }, []);
+
+  return null;
+}
 
 function SystemEmojiFeature() {
   const [twitterEmoji] = useSetting(settingsAtom, 'twitterEmoji');
@@ -77,7 +88,6 @@ function FaviconUpdater() {
 }
 
 function InviteNotifications() {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const invites = useAtomValue(allInvitesAtom);
   const perviousInviteLen = usePreviousValue(invites.length, 0);
   const mx = useMatrixClient();
@@ -104,8 +114,7 @@ function InviteNotifications() {
   );
 
   const playSound = useCallback(() => {
-    const audioElement = audioRef.current;
-    audioElement?.play();
+    audioManager.playSoundOnce(InviteSound, 0.8);
   }, []);
 
   useEffect(() => {
@@ -120,16 +129,10 @@ function InviteNotifications() {
     }
   }, [mx, invites, perviousInviteLen, showNotifications, notificationSound, notify, playSound]);
 
-  return (
-    // eslint-disable-next-line jsx-a11y/media-has-caption
-    <audio ref={audioRef} style={{ display: 'none' }}>
-      <source src={InviteSound} type="audio/ogg" />
-    </audio>
-  );
+  return null;
 }
 
 function MessageNotifications() {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const notifRef = useRef<Notification>();
   const unreadCacheRef = useRef<Map<string, UnreadInfo>>(new Map());
   const mx = useMatrixClient();
@@ -173,8 +176,7 @@ function MessageNotifications() {
   );
 
   const playSound = useCallback(() => {
-    const audioElement = audioRef.current;
-    audioElement?.play();
+    audioManager.playSoundOnce(NotificationSound, 0.8);
   }, []);
 
   useEffect(() => {
@@ -245,12 +247,7 @@ function MessageNotifications() {
     useAuthentication,
   ]);
 
-  return (
-    // eslint-disable-next-line jsx-a11y/media-has-caption
-    <audio ref={audioRef} style={{ display: 'none' }}>
-      <source src={NotificationSound} type="audio/ogg" />
-    </audio>
-  );
+  return null;
 }
 
 type ClientNonUIFeaturesProps = {
@@ -260,11 +257,13 @@ type ClientNonUIFeaturesProps = {
 export function ClientNonUIFeatures({ children }: ClientNonUIFeaturesProps) {
   return (
     <>
+      <AudioManagerInitializer />
       <SystemEmojiFeature />
       <PageZoomFeature />
       <FaviconUpdater />
       <InviteNotifications />
       <MessageNotifications />
+      <CallNotificationToastManager />
       {children}
     </>
   );

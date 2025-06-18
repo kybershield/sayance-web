@@ -11,6 +11,7 @@ The Element Call integration consists of several key components:
 - **`CallButtons.tsx`** - The UI components that render call buttons in chat rooms
 - **`ElementCallWidget.tsx`** - The embedded iframe widget for Element Call
 - **`RoomCallView.tsx`** - The main call view that shows the embedded call interface
+- **`IncomingCallToast.tsx`** - Toast notification for incoming calls with ring sound
 - **`index.ts`** - Exports for the call components
 
 ### Hooks
@@ -26,6 +27,38 @@ The Element Call integration consists of several key components:
 ### Utilities
 
 - **`utils/elementCall.ts`** - Utility functions for Element Call integration
+
+## Call Notification Flow
+
+### 1. Starting a Call
+
+When a user clicks the Element Call button:
+
+1. `CallButtons.tsx` calls `useElementCall().startCall()`
+2. `startCall()` creates an Element Call widget and sends a call notification event
+3. The call notification event (`m.call.notify`) is sent to all room members
+4. The Element Call widget opens for the caller
+
+### 2. Receiving Call Notifications
+
+When another user receives the call notification:
+
+1. `CallNotificationToastManager` listens for `m.call.notify` events
+2. If the event is recent (≤15 seconds) and not from the current user, a toast is shown
+3. `IncomingCallToast` displays with:
+   - Ring sound (if notifications sounds are enabled)
+   - Room name and caller information
+   - Join/Decline buttons
+   - Auto-dismisses after 90 seconds
+
+### 3. Joining the Call
+
+When the user clicks "Join":
+
+1. Ring sound stops
+2. `useElementCall().startCall()` is called to create the Element Call widget
+3. The toast dismisses
+4. Element Call widget opens for the joining user
 
 ## Configuration
 
@@ -53,6 +86,38 @@ Element Call must be configured in your `config.json`:
 - **`elementCall.brand`** - Brand name for the call interface (optional)
 - **`allowedWidgets`** - Array of allowed widget URLs for security
 
+## Audio Files
+
+The system uses the following audio files:
+
+- **`ring.ogg`** - Ring tone for incoming calls (copied from element-web)
+- **`notification.ogg`** - General notification sound
+- **`invite.ogg`** - Invitation notification sound
+
+## Key Features
+
+### Notification Handling
+
+- **Smart filtering**: Only shows notifications for recent events (≤15 seconds)
+- **User filtering**: Doesn't show notifications for your own calls
+- **Ring sound**: Plays ring.ogg for `notify_type: "ring"` events
+- **Settings integration**: Respects user notification sound preferences
+- **Auto-dismiss**: Toasts automatically dismiss after 90 seconds
+- **Room-specific**: Only one toast per room (replaces previous toasts)
+
+### Call Types
+
+- **Voice calls**: Display phone icon and "Voice call started"
+- **Video calls**: Display play icon and "Video call started"
+- **Ring vs Notify**: 2-person rooms get "ring" type, larger rooms get "notify" type
+
+### Toast UI
+
+- **Slide-in animation**: Toast slides in from the right
+- **Fixed positioning**: Top-right corner, high z-index
+- **Beta badge**: Shows β to indicate Element Call is in beta
+- **Responsive actions**: Join/Decline buttons with proper styling
+
 ## Usage
 
 ### Basic Usage - Call Buttons
@@ -65,72 +130,77 @@ import { CallButtons } from '../components/call/CallButtons';
 function RoomHeader({ room }) {
   return (
     <div>
-      {/* Other header content */}
-      <CallButtons
-        room={room}
-        onElementCallStart={(roomId) => {
-          console.log('Call started in room:', roomId);
-        }}
-      />
+      {/* other header content */}
+      <CallButtons room={room} />
     </div>
   );
 }
 ```
 
-### Room Call View - Embedded Widget
+### Call View Integration
 
-Use the `RoomCallView` component to show embedded calls:
+Use `RoomCallView` to show active calls:
 
 ```tsx
-import { RoomCallView } from '../components/call';
+import { RoomCallView } from '../components/call/RoomCallView';
 
 function RoomView({ room }) {
   return (
     <div>
-      {/* Room content */}
       <RoomCallView room={room} />
+      {/* other room content */}
     </div>
   );
 }
 ```
 
-### Advanced Usage - Custom Implementation
+### Notification Integration
 
-You can also use the hooks directly for custom implementations:
+The `CallNotificationToastManager` is automatically included in `ClientNonUIFeatures`:
 
 ```tsx
-import { useElementCall, useCallView } from '../hooks/useElementCall';
-import { CallType, PlatformCallType } from '../types/call';
-
-function CustomCallComponent({ room }) {
-  const { canStartCall, disabledReason, startCall } = useElementCall(room);
-  const { shouldShowCallView, callType, closeCall } = useCallView(room);
-
-  const handleVideoCall = () => {
-    if (canStartCall) {
-      startCall(CallType.Video, PlatformCallType.ElementCall);
-    }
-  };
-
+// Already included - no additional setup needed
+export function ClientNonUIFeatures({ children }) {
   return (
-    <div>
-      <button
-        onClick={handleVideoCall}
-        disabled={!canStartCall}
-        title={disabledReason || 'Start video call'}
-      >
-        Start Call
-      </button>
-
-      {shouldShowCallView && (
-        <div style={{ height: '400px' }}>
-          <ElementCallWidget room={room} callType={callType!} onClose={closeCall} />
-        </div>
-      )}
-    </div>
+    <>
+      <SystemEmojiFeature />
+      <FaviconUpdater />
+      <InviteNotifications />
+      <MessageNotifications />
+      <CallNotificationToastManager /> {/* Handles incoming call notifications */}
+      {children}
+    </>
   );
 }
 ```
+
+## Development
+
+### Testing Call Notifications
+
+1. Set up two users in the same room
+2. User A clicks the Element Call button
+3. User B should receive a toast notification with ring sound
+4. User B can click "Join" to join the call
+
+### Debugging
+
+- Check browser console for `[CallNotificationToastManager]` logs
+- Verify Element Call URL is accessible and in `allowedWidgets`
+- Check notification sound settings in user preferences
+- Ensure `m.call.notify` events are being sent/received
+
+## Architecture
+
+The call notification system integrates with:
+
+- **Matrix Events**: Listens for `m.call.notify` events
+- **Settings System**: Respects user notification preferences
+- **Audio System**: Uses existing notification sound infrastructure
+- **Widget System**: Creates Element Call widgets for joining calls
+- **Call State Management**: Tracks active calls to prevent duplicates
+
+This provides a seamless experience where users are notified of incoming calls and can easily join them with a single click.
 
 ## Features
 
@@ -275,6 +345,4 @@ Test the Element Call integration by:
 
 ## Related Files
 
-- `src/app/hooks/useClientConfig.ts` - Configuration management
-- `src/app/hooks/useMatrixClient.ts` - Matrix client access
-- `config.json` - Application configuration
+- `

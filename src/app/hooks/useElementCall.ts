@@ -138,7 +138,7 @@ export function useElementCall(room: Room): UseElementCallResult {
         console.log('Created Element Call widget:', widget);
         
         // Send call notification to room members
-        await sendCallNotification(mx, room.roomId, callType);
+        // await sendCallNotification(mx, room.roomId, callType);
         
         // Start embedded call tracking with widget
         startEmbeddedCall(room.roomId, callType, widget);

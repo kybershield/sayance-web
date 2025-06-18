@@ -1,0 +1,64 @@
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.incomingCallToast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 20rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--bg-surface-variant);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  animation: slideIn 0.3s ease-out;
+}
+
+.toastHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.toastContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.toastActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.callIcon {
+  color: var(--accent-color);
+}
+
+/* Make sure toast is above other elements */
+.incomingCallToast {
+  z-index: 10000;
+} 

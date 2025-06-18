@@ -32,6 +32,19 @@ import {
   type ITurnServer as IClientTurnServer,
 } from 'matrix-js-sdk';
 
+export enum ElementWidgetCapabilities {
+    /**
+     * @deprecated Use MSC2931 instead.
+     */
+    CanChangeViewedRoom = "io.element.view_room",
+    /**
+     * Ask Element to not give the option to move the widget into a separate tab.
+     * This replaces RequiresClient in MatrixCapabilities.
+     */
+    RequiresClient = "io.element.requires_client",
+}
+
+
 /**
  * SayanceWidgetDriver implements the WidgetDriver interface for sayance-web
  * Based on element-web's StopGapWidgetDriver but adapted for sayance-web's architecture
@@ -51,6 +64,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
     this.allowedCapabilities = new Set([
       MatrixCapabilities.Screenshots,
       MatrixCapabilities.AlwaysOnScreen,
+      ElementWidgetCapabilities.RequiresClient,
     ]);
 
     // Add Element Call specific capabilities for virtual call widgets
@@ -60,6 +74,8 @@ export class SayanceWidgetDriver extends WidgetDriver {
       this.allowedCapabilities.add(`org.matrix.msc2762.timeline:${roomId}`);
       this.allowedCapabilities.add(MatrixCapabilities.MSC4157SendDelayedEvent);
       this.allowedCapabilities.add(MatrixCapabilities.MSC4157UpdateDelayedEvent);
+      this.allowedCapabilities.add(MatrixCapabilities.MSC2931Navigate);
+      
 
       // State event capabilities
       this.allowedCapabilities.add(
@@ -143,11 +159,9 @@ export class SayanceWidgetDriver extends WidgetDriver {
       allowedCapabilities.forEach(cap => this.allowedCapabilities.add(cap));
     }
 
-    console.log('[SayanceWidgetDriver] Initialized with capabilities:', Array.from(this.allowedCapabilities));
   }
 
   public async validateCapabilities(requested: Set<Capability>): Promise<Set<Capability>> {
-    console.log('[SayanceWidgetDriver] Validating capabilities:', Array.from(requested));
     
     // For Element Call, auto-approve all our allowed capabilities
     const approved = new Set<Capability>();
@@ -155,7 +169,6 @@ export class SayanceWidgetDriver extends WidgetDriver {
     for (const capability of requested) {
       if (this.allowedCapabilities.has(capability)) {
         approved.add(capability);
-        console.log('[SayanceWidgetDriver] Auto-approved capability:', capability);
       } else {
         console.warn('[SayanceWidgetDriver] Rejecting unknown capability:', capability);
       }

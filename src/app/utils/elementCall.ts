@@ -1,4 +1,4 @@
-import { Room, MatrixClient } from 'matrix-js-sdk';
+import { Room, MatrixClient, EventType } from 'matrix-js-sdk';
 import { ElementCallConfig } from '../hooks/useClientConfig';
 import { CallType } from '../types/call';
 
@@ -35,12 +35,12 @@ export function generateElementCallWidgetUrl(
   widgetId: string
 ): string {
   const baseUrl = window.location.href;
-  
+
   // First try the local widget wrapper (like element-web)
   let url = new URL('./widgets/element-call/index.html#', baseUrl);
-  
+
   // If Element Call URL is configured, use that instead
-  // if (config.url) { 
+  // if (config.url) {
   //   try {
   //     url = new URL(config.url);
   //   } catch {
@@ -77,7 +77,7 @@ export function generateElementCallWidgetUrl(
   // Set the hash with parameters (replace %24 with $ for template variables)
   const replacedUrl = params.toString().replace(/%24/g, '$');
   url.hash = `#?${replacedUrl}`;
-  
+
   return url.toString().replace('#', '');
 }
 
@@ -93,7 +93,7 @@ export function createElementCallWidgetData(
   } = {}
 ): WidgetData {
   const room = client.getRoom(roomId);
-  
+
   return {
     skipLobby: options.skipLobby ?? false,
     returnToLobby: options.returnToLobby ?? false,
@@ -107,7 +107,13 @@ export function createElementCallWidgetData(
 export function generateWidgetId(): string {
   const array = new Uint8Array(12);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export function generateCallId(): string {
+  const array = new Uint8Array(12);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -117,8 +123,8 @@ export function isWidgetUrlAllowed(url: string, allowedWidgets: string[] = []): 
   try {
     const urlObj = new URL(url);
     const origin = urlObj.origin;
-    
-    return allowedWidgets.some(allowed => {
+
+    return allowedWidgets.some((allowed) => {
       try {
         const allowedObj = new URL(allowed);
         return allowedObj.origin === origin;
@@ -137,16 +143,16 @@ export function isWidgetUrlAllowed(url: string, allowedWidgets: string[] = []): 
 export async function sendCallNotification(
   client: MatrixClient,
   roomId: string,
-  callType: CallType
+  call_id: string
 ): Promise<void> {
   const room = client.getRoom(roomId);
   if (!room) return;
 
   const memberCount = room.getJoinedMemberCount();
-  
+
   // Send call notification event
   try {
-    await client.sendEvent(roomId, 'm.call.notify' as any, {
+    await client.sendEvent(roomId, EventType.CallNotify, {
       application: 'm.call',
       'm.mentions': { user_ids: [], room: true },
       notify_type: memberCount === 2 ? 'ring' : 'notify',
@@ -183,4 +189,4 @@ export function createElementCallWidget(
     data: widgetData,
     waitForIframeLoad: false,
   };
-} 
+}

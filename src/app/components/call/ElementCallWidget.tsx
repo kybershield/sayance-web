@@ -1,11 +1,12 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { Room } from 'matrix-js-sdk';
-import { ClientWidgetApi, Widget, WidgetKind } from 'matrix-widget-api';
-import { useCallState, getCallWidget } from '../../hooks/useCallState';
+import { ClientWidgetApi, Widget } from 'matrix-widget-api';
+import { getCallWidget } from '../../hooks/useCallState';
 import { useMatrixClient } from '../../hooks/useMatrixClient';
 import { CallType } from '../../types/call';
 import { SayanceWidgetDriver } from '../../utils/SayanceWidgetDriver';
 import styles from './ElementCallWidget.module.css';
+import { sendCallNotification } from '../../utils/elementCall';
 
 interface ElementCallWidgetProps {
   room: Room;
@@ -28,6 +29,7 @@ export function ElementCallWidget({
   const widgetApiRef = useRef<ClientWidgetApi | null>(null);
   const driverRef = useRef<SayanceWidgetDriver | null>(null);
   const matrixClient = useMatrixClient();
+  const myUserId = matrixClient.getUserId();
 
   // Get the widget from call state
   const widget = getCallWidget(room.roomId);
@@ -98,10 +100,23 @@ export function ElementCallWidget({
 
       // Add Element Call specific action handlers
 
+      widgetApi.on('action:org.matrix.msc4157.update_delayed_event', (ev: any) => {
+        console.log('[ElementCallWidget] Update delayed event:', ev.detail.data);
+        widgetApi.transport.reply(ev.detail, {});
+      });
+
       // Handle io.element.join - Element Call trying to join the call
-      widgetApi.on('action:io.element.join', (ev: any) => {
+      widgetApi.on('action:io.element.join', async (ev: any) => {
         ev.preventDefault();
         console.log('[ElementCallWidget] Element Call join request:', ev.detail.data);
+        console.log('Sending call notification', {
+          roomId: room.roomId,
+          callType,
+        });
+
+        if (widget.creatorUserId === myUserId) {
+          await sendCallNotification(matrixClient, room.roomId, callType);
+        }
 
         // Acknowledge the join request - Element Call expects an empty response
         widgetApi.transport.reply(ev.detail, {});

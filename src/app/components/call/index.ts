@@ -1,6 +1,7 @@
 export { CallButtons } from './CallButtons';
 export { ElementCallWidget } from './ElementCallWidget';
 export { RoomCallView } from './RoomCallView';
+export { IncomingCallToast } from './IncomingCallToast';
 
 // Re-export hooks and utilities for convenience
 export { useElementCall, getPlatformCallTypeProps } from '../../hooks/useElementCall';
