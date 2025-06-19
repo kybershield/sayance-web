@@ -29,9 +29,8 @@ export function IncomingCallToast({ notifyEvent, onDismiss }: IncomingCallToastP
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   // Get call details from the event
-  const callType = notifyEvent.getContent()?.call_type || 'voice';
+  const callType = notifyEvent.getContent()?.call_id || 'voice';
   const senderId = notifyEvent.getSender();
-  console.log({ elementCallHook, notifyEvent, callType, senderId });
 
   const senderName =
     room && senderId

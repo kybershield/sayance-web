@@ -159,7 +159,7 @@ export async function sendCallNotification(
       application: 'm.call',
       'm.mentions': { user_ids: [], room: true },
       notify_type: memberCount === 2 ? 'ring' : 'notify',
-      call_id: '',
+      call_id: call_id,
     });
   } catch (error) {
     console.warn('Failed to send call notification:', error);

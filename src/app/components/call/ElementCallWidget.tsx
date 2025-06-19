@@ -33,7 +33,6 @@ export function ElementCallWidget({
 
   // Get the widget from call state
   const widget = getCallWidget(room.roomId);
-  console.log({ widget });
 
   // Prepare step - like element-web's prepare()
   useEffect(() => {
