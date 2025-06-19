@@ -3,7 +3,7 @@ import { Room } from 'matrix-js-sdk';
 import { ConnectionState, CallType } from '../types/call';
 import { Widget } from '../utils/elementCall';
 
-interface CallState {
+export interface CallState {
   roomId: string;
   isActive: boolean;
   connectionState: ConnectionState;
@@ -19,7 +19,7 @@ const callStates = new Map<string, CallState>();
 const callStateListeners = new Set<() => void>();
 
 function notifyCallStateChange() {
-  callStateListeners.forEach(listener => listener());
+  callStateListeners.forEach((listener) => listener());
 }
 
 export function setCallState(roomId: string, state: Partial<CallState>) {
@@ -62,8 +62,8 @@ export function getCallWidget(roomId: string): Widget | undefined {
  */
 export function useCallState(room: Room | string): CallState | null {
   const roomId = typeof room === 'string' ? room : room.roomId;
-  const [callState, setCallStateLocal] = useState<CallState | null>(() => 
-    getCallState(roomId) || null
+  const [callState, setCallStateLocal] = useState<CallState | null>(
+    () => getCallState(roomId) || null
   );
 
   useEffect(() => {
@@ -84,9 +84,7 @@ export function useCallState(room: Room | string): CallState | null {
  * Hook to track all ongoing calls
  */
 export function useAllCallStates(): CallState[] {
-  const [callStates, setCallStatesLocal] = useState<CallState[]>(() => 
-    getAllCallStates()
-  );
+  const [callStates, setCallStatesLocal] = useState<CallState[]>(() => getAllCallStates());
 
   useEffect(() => {
     const updateStates = () => {
@@ -107,7 +105,7 @@ export function useAllCallStates(): CallState[] {
  */
 export function useHasOngoingCalls(): boolean {
   const callStates = useAllCallStates();
-  return callStates.some(state => state.isActive);
+  return callStates.some((state) => state.isActive);
 }
 
 /**
@@ -183,4 +181,4 @@ export function trackCallWindow(roomId: string, callWindow: Window) {
     clearInterval(checkClosed);
     window.removeEventListener('beforeunload', handleBeforeUnload);
   };
-} 
+}

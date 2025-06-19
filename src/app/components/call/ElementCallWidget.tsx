@@ -29,7 +29,6 @@ export function ElementCallWidget({
   const widgetApiRef = useRef<ClientWidgetApi | null>(null);
   const driverRef = useRef<SayanceWidgetDriver | null>(null);
   const matrixClient = useMatrixClient();
-  const myUserId = matrixClient.getUserId();
 
   // Get the widget from call state
   const widget = getCallWidget(room.roomId);

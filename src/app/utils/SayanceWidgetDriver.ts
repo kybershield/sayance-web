@@ -33,17 +33,16 @@ import {
 } from 'matrix-js-sdk';
 
 export enum ElementWidgetCapabilities {
-    /**
-     * @deprecated Use MSC2931 instead.
-     */
-    CanChangeViewedRoom = "io.element.view_room",
-    /**
-     * Ask Element to not give the option to move the widget into a separate tab.
-     * This replaces RequiresClient in MatrixCapabilities.
-     */
-    RequiresClient = "io.element.requires_client",
+  /**
+   * @deprecated Use MSC2931 instead.
+   */
+  CanChangeViewedRoom = 'io.element.view_room',
+  /**
+   * Ask Element to not give the option to move the widget into a separate tab.
+   * This replaces RequiresClient in MatrixCapabilities.
+   */
+  RequiresClient = 'io.element.requires_client',
 }
-
 
 /**
  * SayanceWidgetDriver implements the WidgetDriver interface for sayance-web
@@ -65,6 +64,11 @@ export class SayanceWidgetDriver extends WidgetDriver {
       MatrixCapabilities.Screenshots,
       MatrixCapabilities.AlwaysOnScreen,
       ElementWidgetCapabilities.RequiresClient,
+      'org.matrix.msc3819.receive.to_device:org.matrix.call.sdp_stream_metadata_changed',
+      'org.matrix.msc3819.send.to_device:m.call.replaces',
+      'org.matrix.msc3819.receive.to_device:m.call.replaces',
+      'org.matrix.msc4157.send.delayed_event',
+      'org.matrix.msc4157.update_delayed_event',
     ]);
 
     // Add Element Call specific capabilities for virtual call widgets
@@ -75,7 +79,6 @@ export class SayanceWidgetDriver extends WidgetDriver {
       this.allowedCapabilities.add(MatrixCapabilities.MSC4157SendDelayedEvent);
       this.allowedCapabilities.add(MatrixCapabilities.MSC4157UpdateDelayedEvent);
       this.allowedCapabilities.add(MatrixCapabilities.MSC2931Navigate);
-      
 
       // State event capabilities
       this.allowedCapabilities.add(
@@ -91,7 +94,11 @@ export class SayanceWidgetDriver extends WidgetDriver {
       const clientUserId = this.matrixClient.getSafeUserId();
       // For the legacy membership type
       this.allowedCapabilities.add(
-        WidgetEventCapability.forStateEvent(EventDirection.Send, 'org.matrix.msc3401.call.member', clientUserId).raw
+        WidgetEventCapability.forStateEvent(
+          EventDirection.Send,
+          'org.matrix.msc3401.call.member',
+          clientUserId
+        ).raw
       );
 
       const clientDeviceId = this.matrixClient.getDeviceId();
@@ -114,7 +121,10 @@ export class SayanceWidgetDriver extends WidgetDriver {
         );
       }
       this.allowedCapabilities.add(
-        WidgetEventCapability.forStateEvent(EventDirection.Receive, 'org.matrix.msc3401.call.member').raw
+        WidgetEventCapability.forStateEvent(
+          EventDirection.Receive,
+          'org.matrix.msc3401.call.member'
+        ).raw
       );
       // for determining auth rules specific to the room version
       this.allowedCapabilities.add(
@@ -130,8 +140,12 @@ export class SayanceWidgetDriver extends WidgetDriver {
         'io.element.call.reaction',
       ];
       for (const eventType of sendRecvRoomEvents) {
-        this.allowedCapabilities.add(WidgetEventCapability.forRoomEvent(EventDirection.Send, eventType).raw);
-        this.allowedCapabilities.add(WidgetEventCapability.forRoomEvent(EventDirection.Receive, eventType).raw);
+        this.allowedCapabilities.add(
+          WidgetEventCapability.forRoomEvent(EventDirection.Send, eventType).raw
+        );
+        this.allowedCapabilities.add(
+          WidgetEventCapability.forRoomEvent(EventDirection.Receive, eventType).raw
+        );
       }
 
       // To-device events for Element Call
@@ -149,23 +163,25 @@ export class SayanceWidgetDriver extends WidgetDriver {
         EventType.CallEncryptionKeysPrefix,
       ];
       for (const eventType of sendRecvToDevice) {
-        this.allowedCapabilities.add(WidgetEventCapability.forToDeviceEvent(EventDirection.Send, eventType).raw);
-        this.allowedCapabilities.add(WidgetEventCapability.forToDeviceEvent(EventDirection.Receive, eventType).raw);
+        this.allowedCapabilities.add(
+          WidgetEventCapability.forToDeviceEvent(EventDirection.Send, eventType).raw
+        );
+        this.allowedCapabilities.add(
+          WidgetEventCapability.forToDeviceEvent(EventDirection.Receive, eventType).raw
+        );
       }
     }
 
     // Add any additional allowed capabilities
     if (allowedCapabilities) {
-      allowedCapabilities.forEach(cap => this.allowedCapabilities.add(cap));
+      allowedCapabilities.forEach((cap) => this.allowedCapabilities.add(cap));
     }
-
   }
 
   public async validateCapabilities(requested: Set<Capability>): Promise<Set<Capability>> {
-    
     // For Element Call, auto-approve all our allowed capabilities
     const approved = new Set<Capability>();
-    
+
     for (const capability of requested) {
       if (this.allowedCapabilities.has(capability)) {
         approved.add(capability);
@@ -173,7 +189,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
         console.warn('[SayanceWidgetDriver] Rejecting unknown capability:', capability);
       }
     }
-    
+
     return approved;
   }
 
@@ -181,7 +197,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
     eventType: string,
     content: IContent,
     stateKey: string | null = null,
-    targetRoomId: string | null = null,
+    targetRoomId: string | null = null
   ): Promise<ISendEventDetails> {
     const roomId = targetRoomId || this.roomId;
 
@@ -194,7 +210,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
         roomId,
         eventType as keyof StateEvents,
         content as StateEvents[keyof StateEvents],
-        stateKey,
+        stateKey
       );
     } else if (eventType === EventType.RoomRedaction) {
       // special case: extract the `redacts` property and call redact
@@ -204,7 +220,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
       r = await this.matrixClient.sendEvent(
         roomId,
         eventType as keyof TimelineEvents,
-        content as TimelineEvents[keyof TimelineEvents],
+        content as TimelineEvents[keyof TimelineEvents]
       );
     }
 
@@ -217,7 +233,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
     eventType: string,
     content: IContent,
     stateKey: string | null = null,
-    targetRoomId: string | null = null,
+    targetRoomId: string | null = null
   ): Promise<ISendDelayedEventDetails> {
     const roomId = targetRoomId || this.roomId;
 
@@ -245,7 +261,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
         delayOpts,
         eventType as keyof StateEvents,
         content as StateEvents[keyof StateEvents],
-        stateKey,
+        stateKey
       );
     } else {
       // message event
@@ -254,7 +270,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
         delayOpts,
         null,
         eventType as keyof TimelineEvents,
-        content as TimelineEvents[keyof TimelineEvents],
+        content as TimelineEvents[keyof TimelineEvents]
       );
     }
 
@@ -266,14 +282,17 @@ export class SayanceWidgetDriver extends WidgetDriver {
     };
   }
 
-  public async updateDelayedEvent(delayId: string, action: UpdateDelayedEventAction): Promise<void> {
+  public async updateDelayedEvent(
+    delayId: string,
+    action: UpdateDelayedEventAction
+  ): Promise<void> {
     await (this.matrixClient as any)._unstable_updateDelayedEvent(delayId, action);
   }
 
   public async sendToDevice(
     eventType: string,
     encrypted: boolean,
-    contentMap: { [userId: string]: { [deviceId: string]: object } },
+    contentMap: { [userId: string]: { [deviceId: string]: object } }
   ): Promise<void> {
     if (encrypted) {
       const crypto = this.matrixClient.getCrypto();
@@ -297,11 +316,11 @@ export class SayanceWidgetDriver extends WidgetDriver {
           const batch = await crypto.encryptToDeviceMessages(
             eventType,
             recipients,
-            JSON.parse(stringifiedContent),
+            JSON.parse(stringifiedContent)
           );
 
           await this.matrixClient.queueToDevice(batch);
-        }),
+        })
       );
     } else {
       await this.matrixClient.queueToDevice({
@@ -311,7 +330,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
             userId,
             deviceId,
             payload: content,
-          })),
+          }))
         ),
       });
     }
@@ -323,7 +342,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
     msgtype: string | undefined,
     stateKey: string | undefined,
     limit: number,
-    since: string | undefined,
+    since: string | undefined
   ): Promise<IRoomEvent[]> {
     limit = limit > 0 ? Math.min(limit, Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER;
 
@@ -337,7 +356,8 @@ export class SayanceWidgetDriver extends WidgetDriver {
       if (since !== undefined && ev.getId() === since) break;
 
       if (ev.getType() !== eventType) continue;
-      if (eventType === EventType.RoomMessage && msgtype && msgtype !== ev.getContent()['msgtype']) continue;
+      if (eventType === EventType.RoomMessage && msgtype && msgtype !== ev.getContent()['msgtype'])
+        continue;
       if (stateKey !== undefined && ev.getStateKey() !== stateKey) continue;
       results.push(ev);
     }
@@ -345,7 +365,11 @@ export class SayanceWidgetDriver extends WidgetDriver {
     return results.map((e) => e.getEffectiveEvent() as IRoomEvent);
   }
 
-  public async readRoomState(roomId: string, eventType: string, stateKey: string | undefined): Promise<IRoomEvent[]> {
+  public async readRoomState(
+    roomId: string,
+    eventType: string,
+    stateKey: string | undefined
+  ): Promise<IRoomEvent[]> {
     const room = this.matrixClient.getRoom(roomId);
     if (room === null) return [];
     const state = room.getLiveTimeline().getState(Direction.Forward);
@@ -380,13 +404,18 @@ export class SayanceWidgetDriver extends WidgetDriver {
     let setTurnServer: (server: ITurnServer) => void;
     let setError: (error: Error) => void;
 
-    const normalizeTurnServer = ({ urls, username, credential }: IClientTurnServer): ITurnServer => ({
+    const normalizeTurnServer = ({
+      urls,
+      username,
+      credential,
+    }: IClientTurnServer): ITurnServer => ({
       uris: urls,
       username,
       password: credential,
     });
 
-    const onTurnServers = ([server]: IClientTurnServer[]): void => setTurnServer(normalizeTurnServer(server));
+    const onTurnServers = ([server]: IClientTurnServer[]): void =>
+      setTurnServer(normalizeTurnServer(server));
     const onTurnServersError = (error: Error, fatal: boolean): void => {
       if (fatal) setError(error);
     };
@@ -421,7 +450,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
     from?: string,
     to?: string,
     limit?: number,
-    direction?: 'f' | 'b',
+    direction?: 'f' | 'b'
   ): Promise<IReadEventRelationsResult> {
     const dir = direction as Direction;
     roomId = roomId ?? this.roomId;
@@ -435,7 +464,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
       eventId,
       relationType ?? null,
       eventType ?? null,
-      { from, to, limit, dir },
+      { from, to, limit, dir }
     );
 
     return {
@@ -445,8 +474,14 @@ export class SayanceWidgetDriver extends WidgetDriver {
     };
   }
 
-  public async searchUserDirectory(searchTerm: string, limit?: number): Promise<ISearchUserDirectoryResult> {
-    const { limited, results } = await this.matrixClient.searchUserDirectory({ term: searchTerm, limit });
+  public async searchUserDirectory(
+    searchTerm: string,
+    limit?: number
+  ): Promise<ISearchUserDirectoryResult> {
+    const { limited, results } = await this.matrixClient.searchUserDirectory({
+      term: searchTerm,
+      limit,
+    });
 
     return {
       limited,
@@ -475,9 +510,7 @@ export class SayanceWidgetDriver extends WidgetDriver {
   }
 
   public getKnownRooms(): string[] {
-    return this.matrixClient
-      .getVisibleRooms()
-      .map((r) => r.roomId);
+    return this.matrixClient.getVisibleRooms().map((r) => r.roomId);
   }
 
   public processError(error: unknown): IWidgetApiErrorResponseDataDetails | undefined {
@@ -485,4 +518,4 @@ export class SayanceWidgetDriver extends WidgetDriver {
     // The actual error response format is handled by the Widget API itself
     return undefined;
   }
-} 
+}
