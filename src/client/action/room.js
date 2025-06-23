@@ -259,6 +259,72 @@ async function createRoom(mx, opts) {
   return result;
 }
 
+async function createCallRoom(mx, otherUserId, originalRoomName, isEncrypted = false) {
+  const options = {
+    name: `Call with ${originalRoomName}`,
+    creation_content: { type: 'org.matrix.msc3417.call' },
+    visibility: 'private',
+    invite: [otherUserId],
+    is_direct: false, // Call rooms are not marked as direct
+    preset: 'private_chat',
+    initial_state: [],
+    power_level_content_override: {
+      users: {
+        [mx.getUserId()]: 100, // Room creator gets admin
+        [otherUserId]: 50, // Invited user gets enough power for call events
+      },
+      events: {
+        // Allow call membership events for users with power level 50+
+        'org.matrix.msc3401.call.member': 50,
+        // Allow other call-related events
+        'org.matrix.msc3401.call': 50,
+        'io.element.call.encryption_keys': 50,
+        // Keep default levels for other events
+        'm.room.message': 0,
+        'm.room.encrypted': 0,
+        'm.reaction': 0,
+      },
+      events_default: 0,
+      state_default: 50,
+      users_default: 0,
+    },
+  };
+
+  if (isEncrypted) {
+    options.initial_state.push({
+      type: 'm.room.encryption',
+      state_key: '',
+      content: {
+        algorithm: 'm.megolm.v1.aes-sha2',
+      },
+    });
+  }
+
+  // Add topic to indicate this is a call room
+  options.topic = `Call room for conversation with ${originalRoomName}`;
+
+  try {
+    const result = await mx.createRoom(options);
+
+    // After creating the room, we could add additional metadata here if needed
+    // For example, we could link it to the original DM room via room account data
+
+    return result;
+  } catch (e) {
+    const errcodes = [
+      'M_UNKNOWN',
+      'M_BAD_JSON',
+      'M_ROOM_IN_USE',
+      'M_INVALID_ROOM_STATE',
+      'M_UNSUPPORTED_ROOM_VERSION',
+    ];
+    if (errcodes.includes(e.errcode)) {
+      throw new Error(e);
+    }
+    throw new Error('Something went wrong creating call room!');
+  }
+}
+
 async function ignore(mx, userIds) {
   let ignoredUsers = mx.getIgnoredUsers().concat(userIds);
   ignoredUsers = [...new Set(ignoredUsers)];
@@ -319,6 +385,7 @@ export {
   join,
   createDM,
   createRoom,
+  createCallRoom,
   ignore,
   unignore,
   setPowerLevel,

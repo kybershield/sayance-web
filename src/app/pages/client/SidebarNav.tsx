@@ -30,7 +30,7 @@ export function SidebarNav() {
         scrollable={
           <Scroll ref={scrollRef} variant="Background" size="0">
             <SidebarStack>
-              {/* <HomeTab /> Possibly where Calls tab will be  */}
+              {/* <HomeTab /> */}
               <DirectTab />
               <InboxTab />
               <SettingsTab />

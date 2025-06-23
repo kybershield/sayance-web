@@ -266,20 +266,22 @@ export function RoomNavItem({
     }
     if (room.isCallRoom()) {
       if (!isMobile) {
+        navigateRoom(room.roomId);
+        setViewedCallRoomId(room.roomId);
         if (activeCallRoomId !== room.roomId) {
-          if (mx.getRoom(viewedRoomId)?.isCallRoom()) {
-            navigateRoom(room.roomId);
+          if (activeCallRoomId && mx.getRoom(viewedRoomId)?.isCallRoom()) {
+            hangUp(activeCallRoomId);
           }
-          hangUp(room.roomId);
           setActiveCallRoomId(room.roomId);
-        } else {
-          navigateRoom(room.roomId);
         }
       } else {
         evt.stopPropagation();
         if (isChatOpen) toggleChat();
         setViewedCallRoomId(room.roomId);
         navigateRoom(room.roomId);
+        if (activeCallRoomId !== room.roomId) {
+          setActiveCallRoomId(room.roomId);
+        }
       }
     } else {
       navigateRoom(room.roomId);
@@ -345,6 +347,11 @@ export function RoomNavItem({
             >
               {room.name}
             </Text>
+            {room.isCallRoom() && (
+              <Text as="span" size="T200" priority="300" truncate style={{ color: '#4CAF50' }}>
+                🎥 Call Room
+              </Text>
+            )}
           </Box>
           {!optionsVisible && !unread && !selected && typingMember.length > 0 && (
             <Badge size="300" variant="Secondary" fill="Soft" radii="Pill" outlined>
@@ -358,6 +365,18 @@ export function RoomNavItem({
           )}
           {!optionsVisible && notificationMode !== RoomNotificationMode.Unset && (
             <Icon size="50" src={getRoomNotificationModeIcon(notificationMode)} />
+          )}
+          {room.isCallRoom() && (
+            <Box
+              style={{
+                width: toRem(8),
+                height: toRem(8),
+                borderRadius: '50%',
+                backgroundColor: isActiveCall ? '#4CAF50' : '#2196F3',
+                marginLeft: toRem(4),
+                flexShrink: 0,
+              }}
+            />
           )}
         </Box>
       </NavItemContent>

@@ -16,47 +16,8 @@ export function WelcomePage() {
           <PageHero
             icon={<img width="70" height="70" src={SayanceLogo} alt="Sayance Logo" />}
             title="Welcome to Sayance"
-            subTitle={
-              <span>
-                End to end encrypted messaging application.
-                {/* <a
-                  href="https://github.com/cinnyapp/cinny/releases"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  v4.8.1
-                </a>
-              </span>
-            }
-          >
-            {/* <Box justifyContent="Center">
-              <Box grow="Yes" style={{ maxWidth: toRem(300) }} direction="Column" gap="300">
-                <Button
-                  as="a"
-                  href="https://github.com/cinnyapp/cinny"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  before={<Icon size="200" src={Icons.Code} />}
-                >
-                  <Text as="span" size="B400" truncate>
-                    Source Code
-                  </Text>
-                </Button>
-                <Button
-                  as="a"
-                  href="https://cinny.in/#sponsor"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  fill="Soft"
-                  before={<Icon size="200" src={Icons.Heart} />}
-                >
-                  <Text as="span" size="B400" truncate>
-                    Support
-                  </Text>
-                </Button>
-              </Box>
-            </Box> */}
-          </PageHero>
+            subTitle={<span>End to end encrypted messaging application.</span>}
+          ></PageHero>
         </PageHeroSection>
       </Box>
     </Page>

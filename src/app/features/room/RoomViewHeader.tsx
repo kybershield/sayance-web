@@ -67,7 +67,9 @@ import {
 } from '../../hooks/useRoomsNotificationPreferences';
 import { useCallState } from '../../pages/client/call/CallProvider';
 import { partialMatrixIdToPhoneNumber } from '../../../util/functionsUtil';
-import MenuIcon from '../../../../../public/icons/menu-icon.svg';
+import MenuIcon from '../../../../public/icons/menu-icon.svg';
+import * as roomActions from '../../../client/action/room';
+import { getDirectRoomPath } from '../../pages/pathUtils';
 
 type RoomMenuProps = {
   room: Room;
@@ -221,9 +223,17 @@ export function RoomViewHeader() {
   const space = useSpaceOptionally();
   const [menuAnchor, setMenuAnchor] = useState<RectCords>();
   const [pinMenuAnchor, setPinMenuAnchor] = useState<RectCords>();
+  const [isStartingCall, setIsStartingCall] = useState(false);
   const mDirects = useAtomValue(mDirectAtom);
 
-  const { isChatOpen, toggleChat } = useCallState();
+  const {
+    isChatOpen,
+    toggleChat,
+    setActiveCallRoomId,
+    setViewedCallRoomId,
+    activeCallRoomId,
+    isCallActive,
+  } = useCallState();
   const pinnedEvents = useRoomPinnedEvents(room);
   const encryptionEvent = useStateEvent(room, StateEvent.RoomEncryption);
   const ecryptedRoom = !!encryptionEvent;
@@ -238,20 +248,116 @@ export function RoomViewHeader() {
 
   // I assume there is a global state so I don't have to run this check every time but for now we'll stub this in
   const isDirectMessage = () => {
-    const mDirectsEvent = mx.getAccountData('m.direct');
+    const mDirectsEvent = mx.getAccountData('m.direct' as any);
     if (mDirectsEvent?.event?.content === undefined) {
       return false;
     }
     const { roomId } = room;
     return (
-      Object.values(mDirectsEvent?.event?.content).filter((e) => {
+      Object.values(mDirectsEvent?.event?.content).filter((e: any) => {
         if (e.indexOf(roomId) === 0) return true;
       }).length !== 0
     );
   };
 
-  const handleCall: MouseEventHandler<HTMLButtonElement> = (evt) => {
-    setMenuAnchor(evt.currentTarget.getBoundingClientRect());
+  /**
+   * Handles call initiation for direct messages
+   *
+   * This function implements the complete call flow:
+   * 1. Validates that this is a direct message with another user
+   * 2. Creates a new Matrix call room with MSC3417 call type
+   * 3. Invites the other participant to the call room
+   * 4. Sets up the call state management (viewed/active call room IDs)
+   * 5. Navigates to the new call room where Element Call widget will load
+   * 6. Provides visual feedback during the process
+   *
+   * The call room is created with:
+   * - type: 'org.matrix.msc3417.call' for proper call room detection
+   * - Same encryption setting as the original DM
+   * - Descriptive name and topic
+   * - Private visibility with invitation-only access
+   */
+  const handleCall: MouseEventHandler<HTMLButtonElement> = async (evt) => {
+    evt.preventDefault();
+
+    if (isStartingCall) return; // Prevent multiple calls
+
+    try {
+      setIsStartingCall(true);
+
+      // If there's already an active call in this room, just navigate to it
+      if (activeCallRoomId === room.roomId && isCallActive) {
+        return;
+      }
+
+      // Check if this room is already a call room
+      if (room.isCallRoom()) {
+        setActiveCallRoomId(room.roomId);
+        setViewedCallRoomId(room.roomId);
+        return;
+      }
+
+      // Create a new call room for direct message
+      if (isDirectMessage()) {
+        // Get the other user in the DM
+        const otherMembers = room
+          .getJoinedMembers()
+          .filter((member) => member.userId !== mx.getUserId());
+
+        if (otherMembers.length === 0) {
+          throw new Error('No other members found in direct message');
+        }
+
+        const otherUserId = otherMembers[0].userId;
+        const roomName = name || otherUserId;
+
+        // Create a call room with the same participants
+        const result = await roomActions.createCallRoom(
+          mx,
+          otherUserId,
+          roomName,
+          !!encryptionEvent
+        );
+
+        if (result?.room_id) {
+          // Set the new call room as viewed first (this triggers widget creation)
+          setViewedCallRoomId(result.room_id);
+
+          // Navigate to the call room
+          navigate(getDirectRoomPath(result.room_id));
+
+          // Small delay to allow navigation to complete before setting as active
+          setTimeout(() => {
+            setActiveCallRoomId(result.room_id);
+          }, 100);
+        } else {
+          throw new Error('Failed to create call room - no room ID returned');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to start call:', error);
+      // You could implement a toast notification system here
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
+      // Provide specific guidance for common permission errors
+      if (errorMessage.includes('M_FORBIDDEN') || errorMessage.includes('permission')) {
+        alert(
+          `Failed to start call: Permission denied. This may be due to room settings or server configuration. Please try again or contact your administrator.\n\nDetails: ${errorMessage}`
+        );
+      } else if (
+        errorMessage.includes('M_ROOM_IN_USE') ||
+        errorMessage.includes('room') ||
+        errorMessage.includes('create')
+      ) {
+        alert(
+          `Failed to start call: Unable to create call room. Please try again.\n\nDetails: ${errorMessage}`
+        );
+      } else {
+        alert(`Failed to start call: ${errorMessage}`);
+      }
+    } finally {
+      setIsStartingCall(false);
+    }
   };
 
   const handleSearchClick = () => {
@@ -348,19 +454,27 @@ export function RoomViewHeader() {
         </Box>
 
         <Box shrink="No">
-          {false && isDirectMessage() && (
+          {isDirectMessage() && (
             <TooltipProvider
               position="Bottom"
               align="End"
               offset={4}
               tooltip={
                 <Tooltip>
-                  <Text>Start a Call</Text>
+                  <Text>{isStartingCall ? 'Starting Call...' : 'Start a Call'}</Text>
                 </Tooltip>
               }
             >
               {(triggerRef) => (
-                <IconButton onClick={handleCall} ref={triggerRef}>
+                <IconButton
+                  onClick={handleCall}
+                  ref={triggerRef}
+                  disabled={isStartingCall}
+                  style={{
+                    opacity: isStartingCall ? 0.6 : 1,
+                    cursor: isStartingCall ? 'wait' : 'pointer',
+                  }}
+                >
                   <Icon size="400" src={Icons.Phone} />
                 </IconButton>
               )}
