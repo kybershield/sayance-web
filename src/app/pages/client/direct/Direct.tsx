@@ -50,6 +50,7 @@ import {
   getRoomNotificationMode,
   useRoomsNotificationPreferencesContext,
 } from '../../../hooks/useRoomsNotificationPreferences';
+import { CallNavStatus } from '../../../features/room-nav/RoomCallNavStatus';
 import SayanceLogo from '../../../../../public/logo.svg';
 import SearchIcon from '../../../../../public/icons/search-icon.svg';
 import MenuIcon from '../../../../../public/icons/menu-icon.svg';
@@ -188,18 +189,9 @@ interface DirectRoomItemProps {
   selected: boolean;
   linkPath: string;
   notificationMode: any;
-  onStartVideoCall: () => void;
-  onStartVoiceCall: () => void;
 }
 
-function DirectRoomItem({
-  room,
-  selected,
-  linkPath,
-  notificationMode,
-  onStartVideoCall,
-  onStartVoiceCall,
-}: DirectRoomItemProps) {
+function DirectRoomItem({ room, selected, linkPath, notificationMode }: DirectRoomItemProps) {
   // const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -228,7 +220,6 @@ export function Direct() {
   const directs = useDirectRooms();
   const notificationPreferences = useRoomsNotificationPreferencesContext();
   const roomToUnread = useAtomValue(roomToUnreadAtom);
-  const [activeCall, setActiveCall] = useState<string | null>(null);
 
   const selectedRoomId = useSelectedRoom();
   const noRoomToDisplay = directs.length === 0;
@@ -252,19 +243,6 @@ export function Direct() {
   const handleCategoryClick = useCategoryHandler(setClosedCategories, (categoryId) =>
     closedCategories.has(categoryId)
   );
-
-  const handleStartVideoCall = (roomId: string) => {
-    setActiveCall(roomId);
-  };
-
-  const handleStartVoiceCall = (roomId: string) => {
-    // For now, voice calls use the same interface but with audio-only
-    setActiveCall(roomId);
-  };
-
-  const handleCloseCall = () => {
-    setActiveCall(null);
-  };
 
   return (
     <PageNav>
@@ -328,8 +306,6 @@ export function Direct() {
                           notificationPreferences,
                           room.roomId
                         )}
-                        onStartVideoCall={() => handleStartVideoCall(roomId)}
-                        onStartVoiceCall={() => handleStartVoiceCall(roomId)}
                       />
                     </VirtualTile>
                   );
@@ -339,6 +315,7 @@ export function Direct() {
           </Box>
         </PageNavContent>
       )}
+      <CallNavStatus />
     </PageNav>
   );
 }

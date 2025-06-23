@@ -2,6 +2,7 @@
   "defaultHomeserver": 2,
   "homeserverList": ["sayance.localhost"],
   "allowCustomHomeservers": true,
+  "elementCallUrl": null,
 
   "featuredCommunities": {
     "openAsDefault": false,

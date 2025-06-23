@@ -10,6 +10,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "preview": "vite preview",
     "lint": "yarn check:eslint && yarn check:prettier",
     "check:eslint": "eslint src/*",
     "check:prettier": "prettier --check .",
@@ -24,8 +25,7 @@
     "@atlaskit/pragmatic-drag-and-drop-auto-scroll": "1.3.0",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "1.0.3",
     "@fontsource/inter": "4.5.14",
-    "@livekit/components-react": "^2.0.0",
-    "@livekit/track-processors": "^0.5.5",
+    "@matrix-org/react-sdk-module-api": "2.5.0",
     "@tanstack/react-query": "5.24.1",
     "@tanstack/react-query-devtools": "5.24.1",
     "@tanstack/react-virtual": "3.2.0",
@@ -35,6 +35,7 @@
     "@vanilla-extract/recipes": "0.3.0",
     "@vanilla-extract/vite-plugin": "3.7.1",
     "await-to-js": "3.0.0",
+    "badwords-list": "2.0.1-4",
     "blurhash": "2.0.4",
     "browser-encrypt-attachment": "0.3.0",
     "chroma-js": "3.1.2",
@@ -47,7 +48,7 @@
     "file-saver": "2.0.5",
     "flux": "4.0.3",
     "focus-trap-react": "10.0.2",
-    "folds": "2.1.0",
+    "folds": "2.2.0",
     "formik": "2.4.6",
     "html-dom-parser": "4.0.0",
     "html-react-parser": "4.2.0",
@@ -60,9 +61,8 @@
     "libphonenumber-js": "1.12.8",
     "linkify-react": "4.1.3",
     "linkifyjs": "4.1.3",
-    "livekit-client": "^2.13.0",
-    "matrix-js-sdk": "35.0.0",
-    "matrix-widget-api": "^1.13.0",
+    "matrix-widget-api": "1.11.0",
+    "matrix-js-sdk": "37.5.0",
     "millify": "6.1.0",
     "pdfjs-dist": "4.2.67",
     "prismjs": "1.30.0",
@@ -89,6 +89,7 @@
     "uuid": "11.1.0"
   },
   "devDependencies": {
+    "@element-hq/element-call-embedded": "0.12.2",
     "@esbuild-plugins/node-globals-polyfill": "0.2.3",
     "@rollup/plugin-inject": "5.0.3",
     "@rollup/plugin-wasm": "6.1.1",
@@ -120,6 +121,6 @@
     "vite-plugin-pwa": "0.20.5",
     "vite-plugin-static-copy": "1.0.4",
     "vite-plugin-top-level-await": "1.4.4"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
+
 }
