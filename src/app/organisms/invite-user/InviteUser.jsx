@@ -159,7 +159,8 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
 
   async function searchUser(username) {
     const phone = username.trim();
-    const inputUsername = phoneNumberToMatrixId(phone);
+    const domain = mx.getUserId()?.split(':')[1];
+    const inputUsername = phoneNumberToMatrixId(phone, domain);
     if (isSearching || inputUsername === '' || inputUsername === searchQuery.username) return;
     const isInputUserId = inputUsername[0] === '@' && inputUsername.indexOf(':') > 1;
     updateIsSearching(true);
@@ -176,7 +177,7 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
           },
         ]);
       } catch (e) {
-        updateSearchQuery({ error: `${inputUsername} not found!` });
+        updateSearchQuery({ error: `${matrixIdToPhoneNumber(inputUsername)} not found!` });
       }
     } else {
       try {

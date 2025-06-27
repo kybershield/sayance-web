@@ -43,6 +43,7 @@ import { useRoomTopic } from '../../../hooks/useRoomMeta';
 import { ScreenSize, useScreenSizeContext } from '../../../hooks/useScreenSize';
 import { BackRouteHandler } from '../../../components/BackRouteHandler';
 import { useMediaAuthentication } from '../../../hooks/useMediaAuthentication';
+import { partialMatrixIdToPhoneNumber } from '../../../../util/functionsUtil';
 
 const COMPACT_CARD_WIDTH = 548;
 
@@ -101,7 +102,7 @@ function InviteCard({ room, userId, direct, compact, onNavigate }: InviteCardPro
       <Box gap="200" alignItems="Baseline">
         <Box grow="Yes">
           <Text size="T200" priority="300" truncate>
-            Invited by <b>{senderName}</b>
+            Invited by <b>{partialMatrixIdToPhoneNumber(senderName || '')}</b>
           </Text>
         </Box>
         <Box shrink="No">
@@ -112,7 +113,11 @@ function InviteCard({ room, userId, direct, compact, onNavigate }: InviteCardPro
         <Avatar size="300">
           <RoomAvatar
             roomId={room.roomId}
-            src={direct ? getDirectRoomAvatarUrl(mx, room, 96, useAuthentication) : getRoomAvatarUrl(mx, room, 96, useAuthentication)}
+            src={
+              direct
+                ? getDirectRoomAvatarUrl(mx, room, 96, useAuthentication)
+                : getRoomAvatarUrl(mx, room, 96, useAuthentication)
+            }
             alt={roomName}
             renderFallback={() => (
               <Text as="span" size="H6">
@@ -125,7 +130,7 @@ function InviteCard({ room, userId, direct, compact, onNavigate }: InviteCardPro
           <Box grow="Yes" direction="Column" gap="200">
             <Box direction="Column">
               <Text size="T300" truncate>
-                <b>{roomName}</b>
+                <b>{partialMatrixIdToPhoneNumber(roomName)}</b>
               </Text>
               {topic && (
                 <Text

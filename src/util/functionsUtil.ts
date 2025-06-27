@@ -17,15 +17,16 @@ export function matrixIdToPhoneNumber(matrixId: string): string {
 /**
  * Transforms a phone number to Matrix ID format
  * @param phoneNumber - Phone number in format +1897989892
+ * @param domain - Domain to use for the Matrix ID (default: sayance.org)
  * @returns Matrix ID in format @1897989892_1:sayance.org
  */
-export function phoneNumberToMatrixId(phoneNumber: string): string {
+export function phoneNumberToMatrixId(phoneNumber: string, domain: string): string {
   // Remove the + prefix and create Matrix ID
   const number = phoneNumber.replace(/^\+/, '');
   if (!/^\d+$/.test(number)) {
     throw new Error('Invalid phone number format');
   }
-  return `@${number}_1:sayance.org`;
+  return `@${number}_1:${domain || 'sayance.org'}`;
 }
 
 /**
@@ -51,10 +52,10 @@ export function partialMatrixIdToPhoneNumber(partialId: string): string {
 export function formatPhoneNumberForBackend(phoneNumber: string, countryCode: CountryCode): string {
   // Clean the phone number by removing non-digit characters except +
   let cleanNumber = phoneNumber.replace(/[^\d+]/g, '');
-  
+
   // Get the country calling code
   const callingCode = getCountryCallingCode(countryCode);
-  
+
   // If the number already starts with +, check if it has the correct country code
   if (cleanNumber.startsWith('+')) {
     const expectedPrefix = `+${callingCode}`;
@@ -68,17 +69,17 @@ export function formatPhoneNumberForBackend(phoneNumber: string, countryCode: Co
       cleanNumber = cleanNumber.substring(callingCode.length);
     }
   }
-  
+
   // Remove leading zero if present (common in local formats)
   if (cleanNumber.startsWith('0')) {
     cleanNumber = cleanNumber.substring(1);
   }
-  
+
   // Ensure we have a valid number (only digits remaining)
   if (!/^\d+$/.test(cleanNumber)) {
     throw new Error('Invalid phone number format');
   }
-  
+
   // Return the properly formatted international number
   return `+${callingCode}${cleanNumber}`;
 }

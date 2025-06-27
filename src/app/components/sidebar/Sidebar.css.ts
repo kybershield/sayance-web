@@ -141,7 +141,7 @@ export const SidebarItemBadge = recipe({
     hasCount: {
       true: {
         top: toRem(-6),
-        left: toRem(-6),
+        left: toRem(0),
       },
       false: {
         top: toRem(-2),
