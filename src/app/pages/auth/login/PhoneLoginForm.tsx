@@ -227,7 +227,7 @@ export function PhoneLoginForm() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))
               }
-              placeholder={placeholder}
+              placeholder="Enter phone number"
               inputMode="numeric"
               variant="Background"
               size="500"
